@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:zentails_wellness/view/login_page_view.dart';
+import 'package:zentails_wellness/view/onboarding_screen/onboarding_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -44,7 +44,7 @@ class SplashScreenState extends State<SplashScreen>
             context, // Current navigation context
             MaterialPageRoute(
                 builder: (context) =>
-                    const LoginPage()), // Navigate to LoginPage
+                    const OnboardingView()), // Navigate to OnboardingView
           );
         });
       }

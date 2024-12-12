@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:zentails_wellness/view/splash_screen_view.dart';
-import 'package:zentails_wellness/view/login_page_view.dart';
+import 'package:zentails_wellness/view/onboarding_screen/onboarding_view.dart';
+import 'package:zentails_wellness/view/splash_screen/splash_screen_view.dart';
+import 'package:zentails_wellness/view/authentication_screen/login_page_view.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -9,13 +10,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Zentails Wellness',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const SplashScreen(), 
+      home: const SplashScreen(),
       routes: {
+        '/onboarding': (context) => const OnboardingView(),
         '/login': (context) => const LoginPage(),
       },
     );
