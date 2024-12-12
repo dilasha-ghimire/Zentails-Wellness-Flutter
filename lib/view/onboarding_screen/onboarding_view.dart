@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:zentails_wellness/view/onboarding_screen/container_image.dart';
-import 'package:zentails_wellness/view/authentication_screen/login_page_view.dart';
+import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
