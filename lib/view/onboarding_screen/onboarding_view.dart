@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:zentails_wellness/view/onboarding_screen/container_image.dart';
+import 'package:zentails_wellness/view/authentication_screen/login_page_view.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
@@ -9,93 +11,156 @@ class OnboardingView extends StatefulWidget {
 }
 
 class _OnboardingViewState extends State<OnboardingView> {
-  final controller = PageController();
+  final controller =
+      PageController(); // Manages and controls the `PageView` navigation.
+  bool isLastPage =
+      false; // Tracks whether the user is on the last onboarding page.
+
   @override
   void dispose() {
     super.dispose();
-    controller.dispose();
+    controller.dispose(); // Disposes the `PageController` to free up resources.
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: PageView(
-          controller: controller,
+      body: PageView(
+        controller: controller, // Connects the `PageView` to the controller.
+        onPageChanged: (index) {
+          setState(() {
+            isLastPage =
+                index == 3; // Updates the state when the last page is reached.
+          });
+        },
+        children: [
+          buildImageContainer(
+            context,
+            const Color(
+                0xFFFCF5D7), // Background color for the first onboarding screen.
+            "Welcome to\nZentails Wellness", // Heading for the first onboarding page.
+            "Discover the joy of pet therapy\nand unlock a pawsitive path to\nrelaxation and healing.", // Description text for the page.
+            "assets/images/onboarding_pages/Logo.png", // Path to the image asset.
+            isCircular: true, // Configures the image style as circular.
+            imageWidth: MediaQuery.of(context).size.width *
+                0.82, // Dynamically sets the width.
+            imageHeight: MediaQuery.of(context).size.width *
+                0.82, // Dynamically sets the height.
+          ),
+          buildImageContainer(
+            context,
+            const Color(0xFFFCF5D7),
+            "Discover Our\nTherapy Companions",
+            "Explore heartwarming pet\nprofiles and choose your\nperfect therapy companion.",
+            "assets/images/onboarding_pages/TherapyPets.png",
+          ),
+          buildImageContainer(
+            context,
+            const Color(0xFFFCF5D7),
+            "Easy Booking,\nAnytime!",
+            "Select your preferred date, time, and\nduration for a seamless therapy\nsession booking experience.",
+            "assets/images/onboarding_pages/EasyBooking.jpeg",
+          ),
+          buildImageContainer(
+            context,
+            const Color(0xFFFCF5D7),
+            "Start Your Wellness\nJourney Today",
+            "Join us today to experience the\nbenefits of personalized pet therapy.\nPurely pawsitive, always!",
+            "assets/images/onboarding_pages/TherapySessions.jpeg",
+          ),
+        ],
+      ),
+      bottomSheet: Container(
+        color: const Color(
+            0xFFFCF5D7), // Sets the background color of the bottom sheet.
+        padding: const EdgeInsets.symmetric(
+            horizontal: 15), // Adds horizontal padding to the content.
+        height: 70, // Defines the height of the bottom sheet.
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Aligns the children with space between them.
           children: [
-            // First page
-            Container(
-              color: Colors.red,
-              child: const Center(child: Text("Page 1")),
+            TextButton(
+              onPressed: () {
+                controller.jumpToPage(
+                    3); // Skips to the last onboarding page when pressed.
+              },
+              child: const Text(
+                "Skip", // Text displayed on the skip button.
+                style: TextStyle(
+                    fontSize: 18,
+                    color:
+                        Color(0xFF5D4037)), // Styling for the skip button text.
+              ),
             ),
-
-            // Second page
-            Container(
-              color: Colors.green,
-              child: const Center(child: Text("Page 2")),
+            Center(
+              child: SmoothPageIndicator(
+                effect: const WormEffect(
+                  spacing: 15, // Space between dots.
+                  dotColor:
+                      Color.fromARGB(255, 141, 126, 121), // Inactive dot color.
+                  activeDotColor: Color(0xFF5D4037), // Active dot color.
+                ),
+                onDotClicked: (index) {
+                  controller.animateToPage(
+                      index, // Navigates to the clicked dot's page.
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeInOut);
+                },
+                controller:
+                    controller, // Connects the indicator to the `PageView` controller.
+                count: 4, // Total number of pages.
+              ),
             ),
-
-            // Third page
-            Container(
-              color: Colors.blue,
-              child: const Center(child: Text("Page 3")),
-            ),
-
-            // Fourth page
-            Container(
-              color: Colors.yellow,
-              child: const Center(child: Text("Page 4")),
-            ),
+            isLastPage
+                ? TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const LoginPage(), // Navigates to the login page.
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10), // Adds padding around the button text.
+                      decoration: BoxDecoration(
+                        color: const Color(
+                            0xFF5D4037), // Sets the button's background color.
+                        borderRadius: BorderRadius.circular(
+                            20), // Applies rounded corners.
+                      ),
+                      child: const Text(
+                        "Get Started", // Text displayed on the button.
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Color(0xFFFCF5D7), // Sets the text color.
+                        ),
+                      ),
+                    ),
+                  )
+                : TextButton(
+                    onPressed: () {
+                      controller.nextPage(
+                        duration: const Duration(
+                            milliseconds: 600), // Animates to the next page.
+                        curve: Curves.easeInOut, // Adds a smooth easing effect.
+                      );
+                    },
+                    child: const Text(
+                      "Next", // Text displayed on the next button.
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Color(
+                              0xFF5D4037)), // Styling for the next button text.
+                    ),
+                  ),
           ],
         ),
       ),
-      bottomSheet: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 40,
-          ),
-          height: 70,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // TextButton for `Skip`
-              TextButton(
-                  onPressed: () {
-                    controller.jumpToPage(3);
-                  },
-                  child: const Text(
-                    "Skip",
-                    style: TextStyle(fontSize: 18),
-                  )),
-
-              Center(
-                child: SmoothPageIndicator(
-                    effect: WormEffect(
-                        spacing: 15,
-                        dotColor: Colors.purple.shade200,
-                        activeDotColor: Colors.purple),
-                    onDotClicked: (index) {
-                      controller.animateToPage(index,
-                          duration: const Duration(milliseconds: 600),
-                          curve: Curves.easeInOut);
-                    },
-                    controller: controller,
-                    count: 4),
-              ),
-
-              // TextButton for `Next`
-              TextButton(
-                  onPressed: () {
-                    controller.nextPage(
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeInOut);
-                  },
-                  child: const Text(
-                    "Next",
-                    style: TextStyle(fontSize: 18),
-                  )),
-            ],
-          )),
     );
   }
 }
