@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:zentails_wellness/view/authentication_screen/registration_view.dart';
 // Import the dashboard view with an alias to avoid naming conflicts
 import 'package:zentails_wellness/view/dashboard_screen/dashboard_view.dart'
     as dashboard;
@@ -129,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
       child: const SizedBox(
           width: double.infinity,
           child: Text(
-            "Sign in", // Button text
+            "Sign In", // Button text
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20),
           )),
@@ -147,7 +148,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget _signUpBtn() {
     return GestureDetector(
       onTap: () {
-        debugPrint("Sign Up tapped"); // Debug log for sign-up button
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegistrationView()),
+        );
       },
       child: const Text(
         "Sign Up", // Text for sign-up button
