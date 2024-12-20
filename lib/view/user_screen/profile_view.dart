@@ -11,7 +11,6 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFFFCF5D7),
       body: Center(
         child: Text(
           "Profile Screen",

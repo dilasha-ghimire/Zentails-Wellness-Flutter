@@ -81,9 +81,12 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: GreatVibes
+    - family: GreatVibes Regular
       fonts:
         - asset: assets/fonts/GreatVibes-Regular.ttf
+    - family: Montserrat SemiBold
+      fonts:
+        - asset: assets/fonts/MontserratAlternates-SemiBold.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

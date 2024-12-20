@@ -75,7 +75,7 @@ Widget buildImageContainer(
             textAlign: TextAlign.center, // Centers the title horizontally.
             style: const TextStyle(
               fontFamily:
-                  'GreatVibes', // Applies a decorative font to the title.
+                  'GreatVibes Regular', // Applies a decorative font to the title.
               fontWeight: FontWeight.w500,
               fontSize: 45,
               color: Color(
