@@ -11,7 +11,6 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFFFCF5D7),
       body: Center(
         child: Text(
           "History Screen",

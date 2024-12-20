@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zentails_wellness/view/authentication_screen/registration_view.dart';
-// Import the dashboard view with an alias to avoid naming conflicts
 import 'package:zentails_wellness/view/dashboard_screen/dashboard_view.dart'
     as dashboard;
 
@@ -15,16 +14,18 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   // Controllers for the email/phone and password input fields
-  TextEditingController emailOrPhoneController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailOrPhoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF5D4037),
-      body: SingleChildScrollView(
-        // Make the body scrollable
-        child: _page(), // Call the method that builds the main page content
+      body: Center(
+        // Center the entire body
+        child: SingleChildScrollView(
+          child: _page(), // Call the method that builds the main page content
+        ),
       ),
     );
   }
@@ -32,38 +33,37 @@ class _LoginPageState extends State<LoginPage> {
   Widget _page() {
     // Create a main container for the login form
     return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _lottieAnimation(), // Display a Lottie animation
-            const SizedBox(height: 10),
-            const Text(
-              "Welcome!",
-              style: TextStyle(
-                fontFamily: 'GreatVibes',
-                fontSize: 48,
-                color: Color(0xFFFCF5D7), // Text color
-              ),
+      padding: const EdgeInsets.all(30.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // Adjust size to content
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _lottieAnimation(), // Display a Lottie animation
+          const SizedBox(height: 5),
+          const Text(
+            "Welcome!",
+            style: TextStyle(
+              fontFamily: 'GreatVibes Regular',
+              fontSize: 50,
+              color: Color(0xFFFCF5D7), // Text color
             ),
-            const SizedBox(height: 30),
-            // Input fields for email/phone and password
-            _inputField("Email or Phone Number", emailOrPhoneController),
-            const SizedBox(height: 20),
-            _inputField("Password", passwordController, isPassword: true),
-            const SizedBox(height: 50),
-            _loginBtn(), // Button to trigger the login action
-            const SizedBox(height: 30),
-            _extraText(), // Additional text for account recovery
-            const SizedBox(height: 10),
-            _signUpBtn(), // Button to navigate to sign-up
-            const SizedBox(height: 30),
-            _loginDivider(), // Divider for visual separation
-            const SizedBox(height: 20),
-            _googleLoginBtn(), // Button for Google sign-in
-          ],
-        ),
+          ),
+          const SizedBox(height: 30),
+          // Input fields for email/phone and password
+          _inputField("Email or Phone Number", emailOrPhoneController),
+          const SizedBox(height: 20),
+          _inputField("Password", passwordController, isPassword: true),
+          const SizedBox(height: 50),
+          _loginBtn(), // Button to trigger the login action
+          const SizedBox(height: 30),
+          _extraText(), // Additional text for account recovery
+          const SizedBox(height: 10),
+          _signUpBtn(), // Button to navigate to sign-up
+          const SizedBox(height: 30),
+          _loginDivider(), // Divider for visual separation
+          const SizedBox(height: 20),
+          _googleLoginBtn(), // Button for Google sign-in
+        ],
       ),
     );
   }
@@ -71,28 +71,20 @@ class _LoginPageState extends State<LoginPage> {
   Widget _lottieAnimation() {
     // Display Lottie animation for visual appeal
     return SizedBox(
-      height: 200,
-      width: 1800,
+      height: 230,
+      width: double.infinity,
       child: Lottie.asset(
           'assets/Lottie/login_scene.json'), // Path to Lottie asset
     );
   }
 
   Widget _inputField(String hintText, TextEditingController controller,
-      {isPassword = false}) {
-    // Define the border style for input fields
-    var border = OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFFCF5D7)));
-
+      {bool isPassword = false}) {
     return TextField(
       style: const TextStyle(color: Color(0xFFFCF5D7)), // Text color
       controller: controller, // Assign the controller
       decoration: InputDecoration(
         hintText: hintText, // Placeholder text
-        hintStyle: const TextStyle(color: Color(0xFFFCF5D7)), // Hint text color
-        enabledBorder: border, // Style for the border when the field is enabled
-        focusedBorder: border, // Style for the border when the field is focused
       ),
       obscureText: isPassword, // Hide text if it's a password field
     );
@@ -102,14 +94,15 @@ class _LoginPageState extends State<LoginPage> {
     return ElevatedButton(
       onPressed: () {
         // Hardcoded login validation
-        if (emailOrPhoneController.text == 'admin@admin.com' &&
-            passwordController.text == 'admin@123') {
+        if (emailOrPhoneController.text == 'admin' &&
+            passwordController.text == 'admin') {
           // Navigate to DashboardView on successful login
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    const dashboard.DashboardView()), // Use the dashboard alias
+              builder: (context) =>
+                  const dashboard.DashboardView(), // Use the dashboard alias
+            ),
           );
         } else {
           // Show a snackbar with an error message if login fails
@@ -121,19 +114,14 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       },
-      style: ElevatedButton.styleFrom(
-        foregroundColor: const Color(0xFF5D4037),
-        backgroundColor: const Color(0xFFFCF5D7),
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(vertical: 16), // Button padding
-      ),
       child: const SizedBox(
-          width: double.infinity,
-          child: Text(
-            "Sign In", // Button text
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20),
-          )),
+        width: double.infinity,
+        child: Text(
+          "Sign In", // Button text
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
     );
   }
 
@@ -198,12 +186,6 @@ class _LoginPageState extends State<LoginPage> {
         debugPrint(
             "Continue with Google tapped"); // Debug log for Google button
       },
-      style: ElevatedButton.styleFrom(
-        foregroundColor: const Color(0xFF5D4037),
-        backgroundColor: const Color(0xFFFCF5D7),
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(vertical: 16), // Button padding
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
