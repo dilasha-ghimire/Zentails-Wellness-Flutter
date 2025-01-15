@@ -35,7 +35,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    
+
     super.dispose();
     controller.dispose(); // Disposes the `PageController` to free up resources.
   }
@@ -52,39 +52,59 @@ class _OnboardingViewState extends State<OnboardingView> {
           });
         },
         children: [
-          buildImageContainer(
-            context,
-            const Color(
-                0xFFFCF5D7), // Background color for the first onboarding screen.
-            "Welcome to\nZentails Wellness", // Heading for the first onboarding page.
-            "Discover the joy of pet therapy\nand unlock a pawsitive path to\nrelaxation and healing.", // Description text for the page.
-            "assets/images/onboarding_pages/Logo.png", // Path to the image asset.
-            isCircular: true, // Configures the image style as circular.
-            imageWidth: MediaQuery.of(context).size.width *
-                0.82, // Dynamically sets the width.
-            imageHeight: MediaQuery.of(context).size.width *
-                0.82, // Dynamically sets the height.
+          Center(
+            child: buildImageContainer(
+              context,
+              const Color(
+                  0xFFFCF5D7), // Background color for the first onboarding screen.
+              "Welcome to\nZentails Wellness", // Heading for the first onboarding page.
+              "Discover the joy of pet therapy\nand unlock a pawsitive path to\nrelaxation and healing.", // Description text for the page.
+              "assets/images/onboarding_pages/Logo.png", // Path to the image asset.
+              isCircular: true, // Configures the image style as circular.
+              imageWidth: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the width.
+              imageHeight: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the height.
+            ),
           ),
-          buildImageContainer(
-            context,
-            const Color(0xFFFCF5D7),
-            "Discover Our\nTherapy Companions",
-            "Explore heartwarming pet\nprofiles and choose your\nperfect therapy companion.",
-            "assets/images/onboarding_pages/TherapyPets.png",
+          Center(
+            child: buildImageContainer(
+              context,
+              const Color(0xFFFCF5D7),
+              "Discover Our\nTherapy Companions",
+              "Explore heartwarming pet\nprofiles and choose your\nperfect therapy companion.",
+              "assets/images/onboarding_pages/TherapyPets.png",
+              imageWidth: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the width.
+              imageHeight: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the height.
+            ),
           ),
-          buildImageContainer(
-            context,
-            const Color(0xFFFCF5D7),
-            "Easy Booking,\nAnytime!",
-            "Select your preferred date, time, and\nduration for a seamless therapy\nsession booking experience.",
-            "assets/images/onboarding_pages/EasyBooking.jpeg",
+          Center(
+            child: buildImageContainer(
+              context,
+              const Color(0xFFFCF5D7),
+              "Easy Booking,\nAnytime!",
+              "Select your preferred date, time, and\nduration for a seamless therapy\nsession booking experience.",
+              "assets/images/onboarding_pages/EasyBooking.jpeg",
+              imageWidth: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the width.
+              imageHeight: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the height.
+            ),
           ),
-          buildImageContainer(
-            context,
-            const Color(0xFFFCF5D7),
-            "Start Your Wellness\nJourney Today",
-            "Join us today to experience the\nbenefits of personalized pet therapy.\nPurely pawsitive, always!",
-            "assets/images/onboarding_pages/TherapySessions.jpeg",
+          Center(
+            child: buildImageContainer(
+              context,
+              const Color(0xFFFCF5D7),
+              "Start Your Wellness\nJourney Today",
+              "Join us today to experience the\nbenefits of personalized pet therapy.\nPurely pawsitive, always!",
+              "assets/images/onboarding_pages/TherapySessions.jpeg",
+              imageWidth: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the width.
+              imageHeight: MediaQuery.of(context).size.width *
+                  0.70, // Dynamically sets the height.
+            ),
           ),
         ],
       ),

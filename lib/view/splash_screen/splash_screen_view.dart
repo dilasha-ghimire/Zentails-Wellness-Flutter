@@ -58,6 +58,13 @@ class SplashScreenState extends State<SplashScreen>
             // Set the flag to false after showing onboarding
             await prefs.setBool('isFirstLaunch', false);
           } else {
+            // Reset orientation settings before navigating to login
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+            ]);
+
             // Navigate directly to login if not the first launch
             Navigator.pushReplacement(
               context,
@@ -87,8 +94,8 @@ class SplashScreenState extends State<SplashScreen>
           // Fix alignment, width and height of the Lottie animation
           alignment: Alignment.center,
           child: SizedBox(
-            width: 350,
-            height: 350,
+            width: MediaQuery.of(context).size.width * 0.70,
+            height: MediaQuery.of(context).size.width * 0.70,
             child: Lottie.asset(
               "assets/Lottie/welcome_scene.json",
               fit: BoxFit.contain, // Maintain the aspect ratio of the animation
