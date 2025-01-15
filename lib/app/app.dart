@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zentails_wellness/core/app_theme/app_theme.dart';
+import 'package:zentails_wellness/core/theme/app_theme.dart';
 import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
 import 'package:zentails_wellness/view/authentication_screen/registration_view.dart';
 import 'package:zentails_wellness/view/dashboard_screen/dashboard_view.dart';
