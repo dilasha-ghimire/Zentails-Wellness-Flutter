@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
 import 'package:zentails_wellness/view/onboarding_screen/onboarding_view.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -35,17 +37,27 @@ class SplashScreenState extends State<SplashScreen>
     );
 
     // Start a timer for the splash screen
-    Future.delayed(const Duration(milliseconds: 4500), () {
-      // Ensures the widget is still mounted (not disposed)
+    Future.delayed(const Duration(milliseconds: 4500), () async {
       if (mounted) {
-        // Play the fade-out animation, then navigate to the next screen
-        _animationController.forward().then((_) {
-          Navigator.pushReplacement(
-            context, // Current navigation context
-            MaterialPageRoute(
-                builder: (context) =>
-                    const OnboardingView()), // Navigate to OnboardingView
-          );
+        _animationController.forward().then((_) async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+          if (isFirstLaunch) {
+            // Navigate to onboarding if it's the first launch
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const OnboardingView()),
+            );
+            // Set the flag to false after showing onboarding
+            await prefs.setBool('isFirstLaunch', false);
+          } else {
+            // Navigate directly to login if not the first launch
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginView()),
+            );
+          }
         });
       }
     });

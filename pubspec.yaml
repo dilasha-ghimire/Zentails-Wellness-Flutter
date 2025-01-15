@@ -1,5 +1,5 @@
 name: zentails_wellness
-description: "A new Flutter project."
+description: "Flutter mobile app for an individual project with cross-platform support"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -39,6 +39,7 @@ dependencies:
   lottie: ^3.2.0
   smooth_page_indicator: ^1.2.0+3
   flutter_svg: ^2.0.5
+  shared_preferences: ^2.3.5
 
 dev_dependencies:
   flutter_test:
