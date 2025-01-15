@@ -119,7 +119,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              const LoginPage(), // Navigates to the login page.
+                              const LoginView(), // Navigates to the login page.
                         ),
                       );
                     },

@@ -97,7 +97,7 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 10),
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.3,
+                height: MediaQuery.of(context).size.height * 0.4,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
@@ -181,7 +181,7 @@ class _HomeViewState extends State<HomeView> {
               child: Image.asset(
                 imagePath,
                 fit: BoxFit.cover,
-                height: 170,
+                height: 400,
                 width: double.infinity,
               ),
             ),
