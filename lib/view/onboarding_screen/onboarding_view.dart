@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:zentails_wellness/view/onboarding_screen/container_image.dart';
 import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
+import 'package:zentails_wellness/view/onboarding_screen/container_image.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
@@ -17,7 +18,24 @@ class _OnboardingViewState extends State<OnboardingView> {
       false; // Tracks whether the user is on the last onboarding page.
 
   @override
+  void initState() {
+    super.initState();
+
+    // Lock orientation to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
+
+  @override
   void dispose() {
+    // Reset orientation settings when leaving the screen
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    
     super.dispose();
     controller.dispose(); // Disposes the `PageController` to free up resources.
   }
