@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
@@ -19,6 +20,11 @@ class SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    // Lock orientation to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
 
     // Initialize the AnimationController
     _animationController = AnimationController(
