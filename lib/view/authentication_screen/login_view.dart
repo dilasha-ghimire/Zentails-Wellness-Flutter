@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'login_widgets/login_button.dart';
 import 'login_widgets/login_divider.dart';
-import 'login_widgets/login_extra_text.dart';
 import 'login_widgets/login_google_button.dart';
 import 'login_widgets/login_input_field.dart';
 import 'login_widgets/login_lottie_animation.dart';
@@ -32,7 +31,7 @@ class _LoginViewState extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const LottieAnimation(),
-                const SizedBox(height: 5),
+                //const SizedBox(height: 5),
                 const Text(
                   "Welcome!",
                   style: TextStyle(
@@ -58,8 +57,6 @@ class _LoginViewState extends State<LoginView> {
                   passwordController: passwordController,
                 ),
                 const SizedBox(height: 30),
-                const ExtraText(),
-                const SizedBox(height: 10),
                 const SignUpButton(),
                 const SizedBox(height: 30),
                 const LoginDivider(),

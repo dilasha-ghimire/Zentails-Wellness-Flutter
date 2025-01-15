@@ -31,6 +31,7 @@ class _RegistrationViewState extends State<RegistrationView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 30),
                 const Text(
                   "Join Our Family",
                   style: TextStyle(
