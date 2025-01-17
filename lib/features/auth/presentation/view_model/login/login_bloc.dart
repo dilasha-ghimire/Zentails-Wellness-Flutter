@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/core/common/snackbar/my_snackbar.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/login_usecase.dart';
+import 'package:zentails_wellness/features/home/presentation/view/dashboard_screen/dashboard_view.dart';
 
 part 'login_event.dart';
 part 'login_state.dart';
@@ -48,10 +49,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         },
         (r) {
           emit(state.copyWith(isLoading: false, isSuccess: true));
-          showMySnackBar(
-            context: event.context,
-            message: "Login Successful!",
-            color: Colors.green,
+          Navigator.pushReplacement(
+            event.context,
+            MaterialPageRoute(
+              builder: (context) => const DashboardView(),
+            ),
           );
         },
       );
