@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:zentails_wellness/view/authentication_screen/login_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zentails_wellness/features/auth/presentation/view/login_view.dart';
+import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
 
 class AlreadyHaveAccount extends StatelessWidget {
   const AlreadyHaveAccount({super.key});
@@ -7,12 +9,14 @@ class AlreadyHaveAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: const ValueKey('registerButton'),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const LoginView()),
-        );
+        context.read<RegisterBloc>().add(
+              NavigateLoginEvent(
+                destination: LoginView(),
+                context: context,
+              ),
+            );
       },
       child: const Text.rich(
         TextSpan(
