@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
 
 class RegisterButton extends StatelessWidget {
   final TextEditingController fullNameController;
@@ -21,7 +23,17 @@ class RegisterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        context.read<RegisterBloc>().add(RegisterUser(
+              context: context,
+              fullName: fullNameController.text,
+              email: emailController.text,
+              address: addressController.text,
+              contactNumber: contactNumberController.text,
+              password: passwordController.text,
+              confirmPassword: confirmPasswordController.text,
+            ));
+      },
       child: const SizedBox(
         width: double.infinity,
         child: Text(

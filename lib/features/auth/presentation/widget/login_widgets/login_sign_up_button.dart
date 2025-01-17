@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../registration_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zentails_wellness/features/auth/presentation/view/registration_view.dart';
+import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 
 class SignUpButton extends StatelessWidget {
   const SignUpButton({super.key});
@@ -8,11 +9,14 @@ class SignUpButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: const ValueKey('registerButton'),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegistrationView()),
-        );
+        context.read<LoginBloc>().add(
+              NavigateRegisterEvent(
+                destination: const RegistrationView(),
+                context: context,
+              ),
+            );
       },
       child: const Text.rich(
         TextSpan(

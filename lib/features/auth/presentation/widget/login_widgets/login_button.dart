@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../dashboard_screen/dashboard_view.dart' as dashboard;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 
 class LoginButton extends StatelessWidget {
   final TextEditingController emailOrPhoneController;
@@ -14,23 +15,12 @@ class LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        if (emailOrPhoneController.text == 'admin' &&
-            passwordController.text == 'admin') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const dashboard.DashboardView(),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Invalid email or password'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      onPressed: () async {
+        context.read<LoginBloc>().add(LoginUserEvent(
+              context: context,
+              emailOrPhone: emailOrPhoneController.text,
+              password: passwordController.text,
+            ));
       },
       child: const SizedBox(
         width: double.infinity,

@@ -181,7 +181,7 @@ class _HomeViewState extends State<HomeView> {
               child: Image.asset(
                 imagePath,
                 fit: BoxFit.cover,
-                height: 400,
+                height: 250,
                 width: double.infinity,
               ),
             ),
