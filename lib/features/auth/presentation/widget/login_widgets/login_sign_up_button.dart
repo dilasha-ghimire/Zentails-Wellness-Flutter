@@ -13,7 +13,7 @@ class SignUpButton extends StatelessWidget {
       onTap: () {
         context.read<LoginBloc>().add(
               NavigateRegisterEvent(
-                destination: const RegistrationView(),
+                destination: RegistrationView(),
                 context: context,
               ),
             );

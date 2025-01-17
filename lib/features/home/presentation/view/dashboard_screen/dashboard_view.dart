@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:zentails_wellness/view/user_screen/history_view.dart';
-import 'package:zentails_wellness/view/user_screen/home_view.dart';
-import 'package:zentails_wellness/view/user_screen/profile_view.dart';
+import 'package:zentails_wellness/features/home/presentation/view/user_screen/history_view.dart';
+import 'package:zentails_wellness/features/home/presentation/view/user_screen/home_view.dart';
+import 'package:zentails_wellness/features/home/presentation/view/user_screen/profile_view.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
