@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:zentails_wellness/core/network/api_service.dart';
 import 'package:zentails_wellness/core/network/hive_service.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/local_datasource/auth_local_datasource.dart';
+import 'package:zentails_wellness/features/auth/data/data_source/remote_datasource/auth_remote_datasource.dart';
 import 'package:zentails_wellness/features/auth/data/repository/local_repository/auth_local_repository.dart';
+import 'package:zentails_wellness/features/auth/data/repository/remote_repository/auth_remote_repository.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/login_usecase.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
@@ -16,6 +20,9 @@ Future<void> initDependencies() async {
   // Core services
   _initCoreDependencies();
 
+  // Api Service
+  await _initApiService();
+
   // Auth dependencies
   _initAuthDependencies();
 
@@ -28,24 +35,36 @@ void _initCoreDependencies() {
   getIt.registerLazySingleton<HiveService>(() => HiveService());
 }
 
+_initApiService() {
+  getIt.registerLazySingleton<Dio>(() => ApiService(Dio()).dio);
+}
+
 void _initAuthDependencies() {
   // Local data source
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSource(getIt<HiveService>()),
   );
 
-  // Repository
+  // Remote data source
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSource(getIt<Dio>()));
+
+  // Local repository
   getIt.registerLazySingleton<AuthLocalRepository>(
     () => AuthLocalRepository(getIt<AuthLocalDataSource>()),
   );
 
+  // Remote repository
+  getIt.registerLazySingleton<AuthRemoteRepository>(() => AuthRemoteRepository(
+      authRemoteDataSource: getIt<AuthRemoteDataSource>()));
+
   // Use cases
   getIt.registerLazySingleton<RegisterUseCase>(
-    () => RegisterUseCase(getIt<AuthLocalRepository>()),
+    () => RegisterUseCase(getIt<AuthRemoteRepository>()),
   );
 
   getIt.registerLazySingleton<LoginUseCase>(
-    () => LoginUseCase(getIt<AuthLocalRepository>()),
+    () => LoginUseCase(getIt<AuthRemoteRepository>()),
   );
 
   // Blocs
