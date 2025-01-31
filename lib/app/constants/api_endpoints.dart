@@ -10,4 +10,5 @@ class ApiEndpoints {
   // =================== User Routes ===========================
   static const String register = "auth/register";
   static const String login = "auth/login";
+  static const String uploadImage = "customer/uploadImage";
 }

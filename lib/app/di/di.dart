@@ -8,6 +8,7 @@ import 'package:zentails_wellness/features/auth/data/repository/local_repository
 import 'package:zentails_wellness/features/auth/data/repository/remote_repository/auth_remote_repository.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/login_usecase.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase.dart';
+import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
 import 'package:zentails_wellness/features/onboarding/domain/use_case/get_onboarding_data.dart';
@@ -67,10 +68,17 @@ void _initAuthDependencies() {
     () => LoginUseCase(getIt<AuthRemoteRepository>()),
   );
 
+  getIt.registerLazySingleton<UploadImageUsecase>(
+    () => UploadImageUsecase(
+      getIt<AuthRemoteRepository>(),
+    ),
+  );
+
   // Blocs
   getIt.registerFactory<RegisterBloc>(
     () => RegisterBloc(
       registerUseCase: getIt<RegisterUseCase>(),
+      uploadImageUsecase: getIt(),
     ),
   );
 

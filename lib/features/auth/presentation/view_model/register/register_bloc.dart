@@ -1,18 +1,24 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/core/common/snackbar/my_snackbar.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase.dart';
+import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 
 part 'register_event.dart';
 part 'register_state.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final RegisterUseCase _registerUseCase;
+  final UploadImageUsecase _uploadImageUsecase;
 
   RegisterBloc({
     required RegisterUseCase registerUseCase,
+    required UploadImageUsecase uploadImageUsecase,
   })  : _registerUseCase = registerUseCase,
+        _uploadImageUsecase = uploadImageUsecase,
         super(RegisterState.initial()) {
     // Handle navigation to login
     on<NavigateLoginEvent>(
@@ -45,6 +51,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         address: event.address,
         contactNumber: event.contactNumber,
         password: event.password,
+        profilePicture: state.profilePicture,
       ));
 
       result.fold(
@@ -65,6 +72,24 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             message: "Registration successful!",
             color: Colors.green,
           );
+        },
+      );
+    });
+
+    // Handle image load
+    on<LoadImage>((event, emit) async {
+      emit(state.copyWith(isLoading: true));
+      final result = await _uploadImageUsecase.call(
+        UploadImageParams(
+          file: event.file,
+        ),
+      );
+
+      result.fold(
+        (l) => emit(state.copyWith(isLoading: false, isSuccess: false)),
+        (r) {
+          emit(state.copyWith(
+              isLoading: false, isSuccess: true, profilePicture: r));
         },
       );
     });
