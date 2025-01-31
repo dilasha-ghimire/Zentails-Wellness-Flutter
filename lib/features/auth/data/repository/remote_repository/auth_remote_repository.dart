@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:zentails_wellness/core/error/failure.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/remote_datasource/auth_remote_datasource.dart';
@@ -35,5 +37,10 @@ class AuthRemoteRepository implements IAuthRepository {
     } catch (e) {
       return Left(ApiFailure(500, message: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadProfilePicture(File file) {
+    throw UnimplementedError();
   }
 }
