@@ -15,6 +15,7 @@ class AuthApiModel extends Equatable {
   final String address;
   @JsonKey(name: 'contact_number')
   final String contactNumber;
+  final String? profilePicture;
 
   const AuthApiModel({
     this.id,
@@ -23,6 +24,7 @@ class AuthApiModel extends Equatable {
     required this.password,
     required this.address,
     required this.contactNumber,
+    required this.profilePicture,
   });
 
   //fromJson and toJson automatically created using g.dart file
@@ -39,6 +41,7 @@ class AuthApiModel extends Equatable {
       password: entity.password,
       address: entity.address,
       contactNumber: entity.contactNumber,
+      profilePicture: entity.profilePicture,
     );
   }
 
@@ -50,10 +53,18 @@ class AuthApiModel extends Equatable {
       password: password,
       address: address,
       contactNumber: contactNumber,
+      profilePicture: profilePicture,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [id, fullName, email, password, address, contactNumber];
+  List<Object?> get props => [
+        id,
+        fullName,
+        email,
+        password,
+        address,
+        contactNumber,
+        profilePicture,
+      ];
 }
