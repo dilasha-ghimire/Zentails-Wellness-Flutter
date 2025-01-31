@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:zentails_wellness/core/error/failure.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/local_datasource/auth_local_datasource.dart';
@@ -39,5 +41,10 @@ class AuthLocalRepository implements IAuthRepository {
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadProfilePicture(File file) {
+    throw UnimplementedError();
   }
 }
