@@ -11,6 +11,10 @@ part 'login_state.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginUseCase _loginUseCase;
 
+  bool _areFieldsFilled(String emailOrPhone, String password) {
+    return emailOrPhone.isNotEmpty && password.isNotEmpty;
+  }
+
   LoginBloc({
     required LoginUseCase loginUseCase,
   })  : _loginUseCase = loginUseCase,
@@ -29,6 +33,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     // Handle login
     on<LoginUserEvent>((event, emit) async {
+      if (!_areFieldsFilled(event.emailOrPhone, event.password)) {
+        showMySnackBar(
+          context: event.context,
+          message: "All fields must be filled.",
+        );
+        return;
+      }
+
       emit(state.copyWith(isLoading: true));
       final result = await _loginUseCase.call(
         LoginParams(
@@ -44,7 +56,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           showMySnackBar(
             context: event.context,
             message: "Login Failed. Try again.",
-            color: Colors.red,
           );
         },
         (r) {

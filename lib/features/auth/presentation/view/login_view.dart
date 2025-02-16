@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../widget/login_widgets/login_button.dart';
-import '../widget/login_widgets/login_divider.dart';
-import '../widget/login_widgets/login_google_button.dart';
 import '../widget/login_widgets/login_input_field.dart';
 import '../widget/login_widgets/login_lottie_animation.dart';
 import '../widget/login_widgets/login_sign_up_button.dart';
@@ -40,7 +38,7 @@ class LoginView extends StatelessWidget {
                   controller: emailOrPhoneController,
                 ),
                 const SizedBox(height: 20),
-                LoginInputField(
+                LoginPasswordInputField(
                   hintText: "Password",
                   controller: passwordController,
                   isPassword: true,
@@ -52,14 +50,64 @@ class LoginView extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 const SignUpButton(),
-                const SizedBox(height: 30),
-                const LoginDivider(),
-                const SizedBox(height: 20),
-                const GoogleLoginButton(),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LoginPasswordInputField extends StatefulWidget {
+  final String hintText;
+  final TextEditingController controller;
+  final bool isPassword;
+
+  const LoginPasswordInputField({
+    super.key,
+    required this.hintText,
+    required this.controller,
+    this.isPassword = false,
+  });
+
+  @override
+  LoginPasswordInputFieldState createState() => LoginPasswordInputFieldState();
+}
+
+class LoginPasswordInputFieldState extends State<LoginPasswordInputField> {
+  bool _isObscure = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: widget.controller,
+      obscureText: widget.isPassword ? _isObscure : false,
+      style: const TextStyle(color: Color(0xFFFCF5D7)),
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: const TextStyle(color: Color(0xFFFCF5D7)),
+        filled: true,
+        fillColor: Color(0xFF5D4037),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        suffixIcon: widget.isPassword
+            ? IconButton(
+                icon: Icon(
+                  _isObscure ? Icons.visibility_off : Icons.visibility,
+                  color: Color(0xFFFCF5D7),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isObscure = !_isObscure;
+                  });
+                },
+              )
+            : null,
       ),
     );
   }
