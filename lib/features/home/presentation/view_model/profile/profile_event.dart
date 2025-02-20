@@ -7,20 +7,31 @@ abstract class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadCurrentUser extends ProfileEvent {}
+class LoadCurrentUser extends ProfileEvent {
+  final BuildContext context;
+  const LoadCurrentUser({required this.context});
+
+  @override
+  List<Object?> get props => [context];
+}
 
 class UpdateUserState extends ProfileEvent {}
 
 class UploadProfileImage extends ProfileEvent {
+  final BuildContext context;
   final File file;
 
-  const UploadProfileImage({required this.file});
+  const UploadProfileImage({
+    required this.file,
+    required this.context,
+  });
 
   @override
-  List<Object?> get props => [file];
+  List<Object?> get props => [context, file];
 }
 
 class UpdateUser extends ProfileEvent {
+  final BuildContext context;
   final String authId;
   final String fullName;
   final String email;
@@ -28,6 +39,7 @@ class UpdateUser extends ProfileEvent {
   final String address;
 
   const UpdateUser({
+    required this.context,
     required this.authId,
     required this.fullName,
     required this.email,
@@ -36,7 +48,8 @@ class UpdateUser extends ProfileEvent {
   });
 
   @override
-  List<Object?> get props => [authId, fullName, email, contactNumber, address];
+  List<Object?> get props =>
+      [context, authId, fullName, email, contactNumber, address];
 }
 
 class Logout extends ProfileEvent {}

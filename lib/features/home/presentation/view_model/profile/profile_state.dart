@@ -9,6 +9,7 @@ class ProfileState extends Equatable {
   final String contactNumber;
   final String address;
   final String? profilePicture;
+  final String? errorMessage;
 
   const ProfileState({
     required this.isLoading,
@@ -19,6 +20,7 @@ class ProfileState extends Equatable {
     required this.contactNumber,
     required this.address,
     this.profilePicture,
+    this.errorMessage,
   });
 
   factory ProfileState.initial() {
@@ -31,6 +33,7 @@ class ProfileState extends Equatable {
       contactNumber: '',
       address: '',
       profilePicture: null,
+      errorMessage: null,
     );
   }
 
@@ -43,6 +46,7 @@ class ProfileState extends Equatable {
     String? contactNumber,
     String? address,
     String? profilePicture,
+    String? errorMessage,
   }) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
@@ -53,6 +57,7 @@ class ProfileState extends Equatable {
       contactNumber: contactNumber ?? this.contactNumber,
       address: address ?? this.address,
       profilePicture: profilePicture ?? this.profilePicture,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -66,5 +71,6 @@ class ProfileState extends Equatable {
         contactNumber,
         address,
         profilePicture,
+        errorMessage,
       ];
 }

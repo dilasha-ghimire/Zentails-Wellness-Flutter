@@ -28,7 +28,7 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfileBloc>().add(LoadCurrentUser());
+    context.read<ProfileBloc>().add(LoadCurrentUser(context: context));
   }
 
   Future<void> _checkCameraPermission() async {
@@ -45,8 +45,10 @@ class _ProfileViewState extends State<ProfileView> {
         setState(() {
           _img = File(image.path);
         });
+        // ignore: use_build_context_synchronously
         context.read<ProfileBloc>().add(
-              UploadProfileImage(file: _img!),
+              // ignore: use_build_context_synchronously
+              UploadProfileImage(context: context, file: _img!),
             );
       }
     } catch (e) {
@@ -57,7 +59,10 @@ class _ProfileViewState extends State<ProfileView> {
   Future<void> _updateUser() async {
     final userId = await SharedPreferencesService().getUserId();
     if (userId != null) {
+      // ignore: use_build_context_synchronously
       context.read<ProfileBloc>().add(UpdateUser(
+            // ignore: use_build_context_synchronously
+            context: context,
             authId: userId,
             fullName: _nameController.text,
             email: _emailController.text,
@@ -90,7 +95,7 @@ class _ProfileViewState extends State<ProfileView> {
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state.reloadData) {
-            context.read<ProfileBloc>().add(LoadCurrentUser());
+            context.read<ProfileBloc>().add(LoadCurrentUser(context: context));
             context.read<ProfileBloc>().add(UpdateUserState());
           }
         },
@@ -231,7 +236,7 @@ class _ProfileViewState extends State<ProfileView> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginView()), // Replace LoginView with your actual login view
+                                  LoginView()), 
                         );
                       },
                       style: ElevatedButton.styleFrom(
