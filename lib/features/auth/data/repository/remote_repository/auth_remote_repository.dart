@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/core/error/failure.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/remote_datasource/auth_remote_datasource.dart';
 import 'package:zentails_wellness/features/auth/domain/entity/auth_entity.dart';
@@ -23,6 +24,8 @@ class AuthRemoteRepository implements IAuthRepository {
     try {
       final token =
           await _authRemoteDataSource.loginUser(emailOrPhone, password);
+      await SharedPreferencesService().saveToken(token);
+
       return Right(token);
     } catch (e) {
       return Left(ApiFailure(500, message: e.toString()));

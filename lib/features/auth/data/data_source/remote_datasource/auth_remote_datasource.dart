@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/auth_data_source.dart';
 import 'package:zentails_wellness/features/auth/domain/entity/auth_entity.dart';
 
@@ -26,6 +27,8 @@ class AuthRemoteDataSource implements IAuthDataSource {
       if (response.statusCode == 200) {
         // Extract token from response
         final token = response.data["token"];
+        final userId = response.data["user"]["_id"];
+        SharedPreferencesService().saveUserId(userId);
         if (token != null) {
           return token;
         } else {

@@ -2,14 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:zentails_wellness/core/network/api_service.dart';
 import 'package:zentails_wellness/core/network/hive_service.dart';
-import 'package:zentails_wellness/features/auth/data/data_source/local_datasource/auth_local_datasource.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/remote_datasource/auth_remote_datasource.dart';
-import 'package:zentails_wellness/features/auth/data/repository/local_repository/auth_local_repository.dart';
 import 'package:zentails_wellness/features/auth/data/repository/remote_repository/auth_remote_repository.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/login_usecase.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase.dart';
+import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/onboarding/domain/use_case/get_onboarding_data.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:zentails_wellness/features/splash/presentation/view_model/splash_cubit.dart';
@@ -28,6 +28,9 @@ Future<void> initDependencies() async {
 
   // Onboarding dependencies
   _initOnboardingDependencies();
+
+  // Profile dependencies
+  _initProfileDependencies();
 }
 
 void _initCoreDependencies() {
@@ -41,22 +44,23 @@ _initApiService() {
 
 void _initAuthDependencies() {
   // Local data source
-  getIt.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSource(getIt<HiveService>()),
-  );
+  // getIt.registerLazySingleton<AuthLocalDataSource>(
+  //   () => AuthLocalDataSource(getIt<HiveService>()),
+  // );
 
   // Remote data source
   getIt.registerLazySingleton<AuthRemoteDataSource>(
       () => AuthRemoteDataSource(getIt<Dio>()));
 
   // Local repository
-  getIt.registerLazySingleton<AuthLocalRepository>(
-    () => AuthLocalRepository(getIt<AuthLocalDataSource>()),
-  );
+  // getIt.registerLazySingleton<AuthLocalRepository>(
+  //   () => AuthLocalRepository(getIt<AuthLocalDataSource>()),
+  // );
 
   // Remote repository
   getIt.registerLazySingleton<AuthRemoteRepository>(() => AuthRemoteRepository(
-      authRemoteDataSource: getIt<AuthRemoteDataSource>()));
+        authRemoteDataSource: getIt<AuthRemoteDataSource>(),
+      ));
 
   // Use cases
   getIt.registerLazySingleton<RegisterUseCase>(
@@ -82,10 +86,7 @@ void _initAuthDependencies() {
 
   // SplashCubit
   getIt.registerFactory<SplashCubit>(
-    () => SplashCubit(
-      getIt<AuthLocalRepository>(),
-      getIt<HiveService>(),
-    ),
+    () => SplashCubit(getIt<AuthRemoteRepository>()),
   );
 }
 
@@ -96,5 +97,19 @@ void _initOnboardingDependencies() {
 
   getIt.registerFactory<OnboardingBloc>(
     () => OnboardingBloc(getIt<GetOnboardingData>()),
+  );
+}
+
+void _initProfileDependencies() {
+  // Use cases
+  getIt.registerLazySingleton<UploadImageUsecase>(
+    () => UploadImageUsecase(getIt<AuthRemoteRepository>()),
+  );
+
+  // Blocs
+  getIt.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      uploadImageUsecase: getIt<UploadImageUsecase>(),
+    ),
   );
 }
