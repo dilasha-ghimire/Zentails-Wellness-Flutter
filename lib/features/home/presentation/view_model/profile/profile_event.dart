@@ -38,3 +38,5 @@ class UpdateUser extends ProfileEvent {
   @override
   List<Object?> get props => [authId, fullName, email, contactNumber, address];
 }
+
+class Logout extends ProfileEvent {}

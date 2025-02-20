@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_current_user_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/update_user_usecase.dart';
@@ -85,7 +86,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     });
 
     on<UpdateUserState>((event, emit) {
-      emit(state.copyWith(reloadData: false)); 
+      emit(state.copyWith(reloadData: false));
+    });
+
+    on<Logout>((event, emit) async {
+      await SharedPreferencesService().removeUserIdAndToken();
+      emit(state.copyWith(isSuccess: true, reloadData: true));
     });
   }
 }
