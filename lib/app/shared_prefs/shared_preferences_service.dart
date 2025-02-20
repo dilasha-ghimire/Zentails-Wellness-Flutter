@@ -36,4 +36,13 @@ class SharedPreferencesService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');
   }
+
+  // Remove both user ID and token
+  Future<void> removeUserIdAndToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await Future.wait([
+      prefs.remove('token'),
+      prefs.remove('userId'),
+    ]);
+  }
 }

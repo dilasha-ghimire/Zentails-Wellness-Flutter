@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
 import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
+import 'package:zentails_wellness/features/auth/presentation/view/login_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/widget/profile/profile_input_field.dart';
 
@@ -224,7 +225,15 @@ class _ProfileViewState extends State<ProfileView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.read<ProfileBloc>().add(Logout());
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  LoginView()), // Replace LoginView with your actual login view
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         textStyle: TextStyle(fontSize: 25),
                         foregroundColor: const Color(0xFFFCF5D7),
