@@ -48,10 +48,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       result.fold(
         (l) {
           emit(state.copyWith(isLoading: false));
-          showMySnackBar(
-            context: event.context,
-            message: "Failed to load user data. Try again.",
-          );
         },
         (user) {
           emit(state.copyWith(
