@@ -12,4 +12,6 @@ class ApiEndpoints {
   static const String login = "auth/login";
   static const String uploadImage = "customer/uploadImage";
   static const String getById = "customer";
+  static const String updateById = "customer";
+  static const String imageUrl = "http://10.0.2.2:3000/uploads/customers/";
 }

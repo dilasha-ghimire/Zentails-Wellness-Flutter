@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/widget/profile/profile_input_field.dart';
 
@@ -22,6 +24,12 @@ class _ProfileViewState extends State<ProfileView> {
 
   File? _img;
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileBloc>().add(LoadCurrentUser());
+  }
+
   Future<void> _checkCameraPermission() async {
     if (await Permission.camera.request().isRestricted ||
         await Permission.camera.request().isDenied) {
@@ -36,8 +44,6 @@ class _ProfileViewState extends State<ProfileView> {
         setState(() {
           _img = File(image.path);
         });
-        // Trigger the Bloc event to upload the image
-        // ignore: use_build_context_synchronously
         context.read<ProfileBloc>().add(
               UploadProfileImage(file: _img!),
             );
@@ -47,132 +53,193 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  Future<void> _updateUser() async {
+    final userId = await SharedPreferencesService().getUserId();
+    if (userId != null) {
+      context.read<ProfileBloc>().add(UpdateUser(
+            authId: userId,
+            fullName: _nameController.text,
+            email: _emailController.text,
+            contactNumber: _contactController.text,
+            address: _addressController.text,
+          ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Your Details",
-          style: TextStyle(
-            fontFamily: 'GreatVibes Regular',
-            color: Color(0xFF5D4037),
-            fontSize: 40,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(90),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30.0),
+          child: AppBar(
+            title: const Text(
+              "Your Details",
+              style: TextStyle(
+                fontFamily: 'GreatVibes Regular',
+                color: Color(0xFF5D4037),
+                fontSize: 40,
+              ),
+            ),
+            centerTitle: true,
           ),
         ),
-        centerTitle: true,
       ),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, state) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                      backgroundColor: const Color(0xFFFCF5D7),
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      builder: (context) => Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                _checkCameraPermission();
-                                _browseImage(ImageSource.camera);
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(Icons.camera,
-                                  color: Color(0xFFFCF5D7)),
-                              label: const Text('Camera',
-                                  style: TextStyle(color: Color(0xFFFCF5D7))),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF5D4037),
-                                minimumSize: const Size(120, 40),
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                _checkCameraPermission();
-                                _browseImage(ImageSource.gallery);
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(Icons.image,
-                                  color: Color(0xFFFCF5D7)),
-                              label: const Text('Gallery',
-                                  style: TextStyle(color: Color(0xFFFCF5D7))),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF5D4037),
-                                minimumSize: const Size(120, 40),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: const Color(0xFF5D4037),
-                    backgroundImage: _img != null ? FileImage(_img!) : null,
-                    child: _img == null
-                        ? const Icon(
-                            Icons.person,
-                            size: 70,
-                            color: Color(0xFFFCF5D7),
-                          )
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                ProfileInputField(
-                  hintText: "Full Name",
-                  controller: _nameController,
-                ),
-                const SizedBox(height: 20),
-                ProfileInputField(
-                  hintText: "Email",
-                  controller: _emailController,
-                ),
-                const SizedBox(height: 20),
-                ProfileInputField(
-                  hintText: "Contact Number",
-                  controller: _contactController,
-                ),
-                const SizedBox(height: 20),
-                ProfileInputField(
-                  hintText: "Address",
-                  controller: _addressController,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle update logic here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      textStyle: TextStyle(fontSize: 25),
-                      foregroundColor: const Color(0xFFFCF5D7),
-                      backgroundColor: const Color(0xFF5D4037),
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text("Update"),
-                  ),
-                ),
-              ],
-            ),
-          );
+      body: BlocListener<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state.reloadData) {
+            context.read<ProfileBloc>().add(LoadCurrentUser());
+            context.read<ProfileBloc>().add(UpdateUserState());
+          }
         },
+        child: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, state) {
+            if (!state.isLoading) {
+              _nameController.text = state.fullName;
+              _emailController.text = state.email;
+              _contactController.text = state.contactNumber;
+              _addressController.text = state.address;
+            }
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        backgroundColor: const Color(0xFFFCF5D7),
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        builder: (context) => Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  _checkCameraPermission();
+                                  _browseImage(ImageSource.camera);
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.camera,
+                                    color: Color(0xFFFCF5D7)),
+                                label: const Text('Camera',
+                                    style: TextStyle(color: Color(0xFFFCF5D7))),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF5D4037),
+                                  minimumSize: const Size(120, 40),
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  _checkCameraPermission();
+                                  _browseImage(ImageSource.gallery);
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.image,
+                                    color: Color(0xFFFCF5D7)),
+                                label: const Text('Gallery',
+                                    style: TextStyle(color: Color(0xFFFCF5D7))),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF5D4037),
+                                  minimumSize: const Size(120, 40),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: const Color(0xFF5D4037),
+                      backgroundImage: NetworkImage(
+                          '${ApiEndpoints.imageUrl}${state.profilePicture}'),
+                      child: state.profilePicture == null
+                          ? const Icon(
+                              Icons.person,
+                              size: 70,
+                              color: Color(0xFFFCF5D7),
+                            )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  ProfileInputField(
+                    hintText: "Full Name",
+                    controller: _nameController,
+                  ),
+                  const SizedBox(height: 10),
+                  ProfileInputField(
+                    hintText: "Email",
+                    controller: _emailController,
+                  ),
+                  const SizedBox(height: 10),
+                  ProfileInputField(
+                    hintText: "Contact Number",
+                    controller: _contactController,
+                  ),
+                  const SizedBox(height: 10),
+                  ProfileInputField(
+                    hintText: "Address",
+                    controller: _addressController,
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _updateUser,
+                      style: ElevatedButton.styleFrom(
+                        textStyle: TextStyle(fontSize: 25),
+                        foregroundColor: const Color(0xFFFCF5D7),
+                        backgroundColor: const Color(0xFF5D4037),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text("Update"),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        textStyle: TextStyle(fontSize: 25),
+                        foregroundColor: const Color(0xFFFCF5D7),
+                        backgroundColor: const Color(0xFF5D4037),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text("Change Password"),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        textStyle: TextStyle(fontSize: 25),
+                        foregroundColor: const Color(0xFFFCF5D7),
+                        backgroundColor: const Color.fromARGB(255, 99, 34, 14),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text("Logout"),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

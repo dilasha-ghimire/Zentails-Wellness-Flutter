@@ -9,6 +9,8 @@ import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase
 import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
+import 'package:zentails_wellness/features/home/domain/use_case/get_current_user_usecase.dart';
+import 'package:zentails_wellness/features/home/domain/use_case/update_user_usecase.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/onboarding/domain/use_case/get_onboarding_data.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view_model/onboarding_bloc.dart';
@@ -106,10 +108,20 @@ void _initProfileDependencies() {
     () => UploadImageUsecase(getIt<AuthRemoteRepository>()),
   );
 
+  getIt.registerLazySingleton<GetCurrentUserUseCase>(
+    () => GetCurrentUserUseCase(getIt<AuthRemoteRepository>()),
+  );
+
+  getIt.registerLazySingleton<UpdateUserUseCase>(
+    () => UpdateUserUseCase(getIt<AuthRemoteRepository>()),
+  );
+
   // Blocs
   getIt.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       uploadImageUsecase: getIt<UploadImageUsecase>(),
+      getCurrentUserUsecase: getIt<GetCurrentUserUseCase>(),
+      updateUserUsecase: getIt<UpdateUserUseCase>(),
     ),
   );
 }
