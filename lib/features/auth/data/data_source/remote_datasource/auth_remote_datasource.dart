@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
 import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/auth_data_source.dart';
+import 'package:zentails_wellness/features/auth/data/model/auth_api_model.dart';
 import 'package:zentails_wellness/features/auth/domain/entity/auth_entity.dart';
 
 class AuthRemoteDataSource implements IAuthDataSource {
@@ -12,8 +13,21 @@ class AuthRemoteDataSource implements IAuthDataSource {
   AuthRemoteDataSource(this._dio);
 
   @override
-  Future<AuthEntity> getCurrentUser() {
-    throw UnimplementedError();
+  Future<AuthEntity> getCurrentUser() async {
+    try {
+      final userId = await SharedPreferencesService().getUserId();
+      Response response = await _dio.get('${ApiEndpoints.getById}/$userId');
+
+      if (response.statusCode == 200) {
+        return AuthApiModel.fromJson(response.data).toEntity();
+      } else {
+        throw Exception(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      throw Exception(e);
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   @override
@@ -88,6 +102,28 @@ class AuthRemoteDataSource implements IAuthDataSource {
       if (response.statusCode == 200) {
         return response.data['data'];
       } else {
+        throw Exception(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      throw Exception(e);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> updateUser(AuthEntity user) async {
+    try {
+      Response response =
+          await _dio.put('${ApiEndpoints.updateById}/${user.authId}', data: {
+        "full_name": user.fullName,
+        "email": user.email,
+        "contact_number": user.contactNumber,
+        "address": user.address,
+        "profilePicture": user.profilePicture,
+      });
+
+      if (response.statusCode != 200) {
         throw Exception(response.statusMessage);
       }
     } on DioException catch (e) {
