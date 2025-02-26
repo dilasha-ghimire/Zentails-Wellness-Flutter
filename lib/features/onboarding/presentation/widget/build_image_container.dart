@@ -22,10 +22,10 @@ Widget buildImageContainer(
             Container(
               width: isCircular
                   ? MediaQuery.of(context).size.width * 0.6
-                  : MediaQuery.of(context).size.width * 0.8,
+                  : MediaQuery.of(context).size.height * 0.45,
               height: isCircular
                   ? MediaQuery.of(context).size.width * 0.6
-                  : MediaQuery.of(context).size.height * 0.39,
+                  : MediaQuery.of(context).size.height * 0.45,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
