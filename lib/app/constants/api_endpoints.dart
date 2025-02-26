@@ -6,6 +6,9 @@ class ApiEndpoints {
 
   // ====================== Base URL ===========================
   static const String baseUrl = "http://10.0.2.2:3000/api/";
+  static const String imageUrlForUser =
+      "http://10.0.2.2:3000/uploads/customers/";
+  static const String imageUrlForPets = "http://10.0.2.2:3000/uploads/pets/";
 
   // =================== User Routes ===========================
   static const String register = "auth/register";
@@ -13,5 +16,7 @@ class ApiEndpoints {
   static const String uploadImage = "customer/uploadImage";
   static const String getById = "customer";
   static const String updateById = "customer";
-  static const String imageUrl = "http://10.0.2.2:3000/uploads/customers/";
+
+  // =================== Pet Routes ===========================
+  static const String getPets = "pet";
 }
