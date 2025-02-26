@@ -10,7 +10,24 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(90),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30.0),
+          child: AppBar(
+            title: const Text(
+              "Your Order History",
+              style: TextStyle(
+                fontFamily: 'GreatVibes Regular',
+                color: Color(0xFF5D4037),
+                fontSize: 40,
+              ),
+            ),
+            centerTitle: true,
+          ),
+        ),
+      ),
       body: Center(
         child: Text(
           "History Screen",
