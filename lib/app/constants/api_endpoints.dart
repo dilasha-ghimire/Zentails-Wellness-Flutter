@@ -19,4 +19,5 @@ class ApiEndpoints {
 
   // =================== Pet Routes ===========================
   static const String getPets = "pet";
+  static const String getPetById = "pet/";
 }
