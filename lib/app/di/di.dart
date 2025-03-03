@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.dart';
 import 'package:zentails_wellness/core/network/api_service.dart';
 import 'package:zentails_wellness/core/network/hive_service.dart';
 import 'package:zentails_wellness/features/auth/data/data_source/remote_datasource/auth_remote_datasource.dart';
@@ -45,6 +46,9 @@ Future<void> initDependencies() async {
 void _initCoreDependencies() {
   // Register HiveService
   getIt.registerLazySingleton<HiveService>(() => HiveService());
+
+  getIt.registerLazySingleton<SharedPreferencesService>(
+      () => SharedPreferencesService());
 }
 
 _initApiService() {
@@ -58,8 +62,8 @@ void _initAuthDependencies() {
   // );
 
   // Remote data source
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSource(getIt<Dio>()));
+  getIt.registerLazySingleton<AuthRemoteDataSource>(() =>
+      AuthRemoteDataSource(getIt<Dio>(), getIt<SharedPreferencesService>()));
 
   // Local repository
   // getIt.registerLazySingleton<AuthLocalRepository>(
@@ -135,8 +139,8 @@ void _initProfileDependencies() {
 
 void _initPetDependencies() {
   // Data Source
-  getIt.registerLazySingleton<PetRemoteDataSource>(
-      () => PetRemoteDataSource(getIt<Dio>()));
+  getIt.registerLazySingleton<PetRemoteDataSource>(() =>
+      PetRemoteDataSource(getIt<Dio>(), getIt<SharedPreferencesService>()));
 
   // Repository
   getIt.registerLazySingleton<PetRemoteRepository>(() => PetRemoteRepository(
