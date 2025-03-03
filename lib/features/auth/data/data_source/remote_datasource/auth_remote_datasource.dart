@@ -9,15 +9,23 @@ import 'package:zentails_wellness/features/auth/domain/entity/auth_entity.dart';
 
 class AuthRemoteDataSource implements IAuthDataSource {
   final Dio _dio;
+  final SharedPreferencesService _sharedPreferencesService;
 
-  AuthRemoteDataSource(this._dio);
+  AuthRemoteDataSource(this._dio, this._sharedPreferencesService);
 
   @override
   Future<AuthEntity> getCurrentUser() async {
     try {
       final userId = await SharedPreferencesService().getUserId();
-      Response response = await _dio.get('${ApiEndpoints.getById}/$userId');
-
+      String? token = await _sharedPreferencesService.getToken();
+      Response response = await _dio.get(
+        '${ApiEndpoints.getById}/$userId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
       if (response.statusCode == 200) {
         return AuthApiModel.fromJson(response.data).toEntity();
       } else {
@@ -84,6 +92,7 @@ class AuthRemoteDataSource implements IAuthDataSource {
   @override
   Future<String> uploadProfilePicture(File file) async {
     try {
+      String? token = await _sharedPreferencesService.getToken();
       String fileName = file.path.split('/').last;
       FormData formData = FormData.fromMap(
         {
@@ -97,6 +106,11 @@ class AuthRemoteDataSource implements IAuthDataSource {
       Response response = await _dio.post(
         ApiEndpoints.uploadImage,
         data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -114,14 +128,22 @@ class AuthRemoteDataSource implements IAuthDataSource {
   @override
   Future<void> updateUser(AuthEntity user) async {
     try {
-      Response response =
-          await _dio.put('${ApiEndpoints.updateById}/${user.authId}', data: {
-        "full_name": user.fullName,
-        "email": user.email,
-        "contact_number": user.contactNumber,
-        "address": user.address,
-        "profilePicture": user.profilePicture,
-      });
+      String? token = await _sharedPreferencesService.getToken();
+      Response response = await _dio.put(
+        '${ApiEndpoints.updateById}/${user.authId}',
+        data: {
+          "full_name": user.fullName,
+          "email": user.email,
+          "contact_number": user.contactNumber,
+          "address": user.address,
+          "profilePicture": user.profilePicture,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
 
       if (response.statusCode != 200) {
         throw Exception(response.statusMessage);
