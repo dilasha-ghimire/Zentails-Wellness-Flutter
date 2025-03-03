@@ -14,3 +14,11 @@ class LoadPets extends PetEvent {
   @override
   List<Object?> get props => [context];
 }
+
+class SelectPet extends PetEvent {
+  final String petId;
+  const SelectPet({required this.petId});
+
+  @override
+  List<Object?> get props => [petId];
+}

@@ -10,12 +10,16 @@ import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase
 import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
+import 'package:zentails_wellness/features/home/data/data_source/pet_details_remote_datasource.dart';
 import 'package:zentails_wellness/features/home/data/data_source/pet_remote_datasource.dart';
+import 'package:zentails_wellness/features/home/data/repository/pet_details_remote_repository.dart';
 import 'package:zentails_wellness/features/home/data/repository/pet_remote_repository.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_current_user_usecase.dart';
+import 'package:zentails_wellness/features/home/domain/use_case/get_pet_details_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_pets_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/update_user_usecase.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/onboarding/domain/use_case/get_onboarding_data.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view_model/onboarding_bloc.dart';
@@ -142,16 +146,30 @@ void _initPetDependencies() {
   getIt.registerLazySingleton<PetRemoteDataSource>(() =>
       PetRemoteDataSource(getIt<Dio>(), getIt<SharedPreferencesService>()));
 
+  getIt.registerLazySingleton<PetDetailsRemoteDataSource>(() =>
+      PetDetailsRemoteDataSource(
+          getIt<Dio>(), getIt<SharedPreferencesService>()));
+
   // Repository
   getIt.registerLazySingleton<PetRemoteRepository>(() => PetRemoteRepository(
         petRemoteDataSource: getIt<PetRemoteDataSource>(),
       ));
 
+  getIt.registerLazySingleton<PetDetailsRemoteRepository>(() =>
+      PetDetailsRemoteRepository(
+          petDetailsRemoteDataSource: getIt<PetDetailsRemoteDataSource>()));
+
   // Usecase
   getIt.registerLazySingleton<GetPetsUseCase>(
       () => GetPetsUseCase(getIt<PetRemoteRepository>()));
 
+  getIt.registerLazySingleton<GetPetDetailsUseCase>(
+      () => GetPetDetailsUseCase(getIt<PetDetailsRemoteRepository>()));
+
   // Bloc
   getIt.registerFactory<PetBloc>(
       () => PetBloc(getPetsUseCase: getIt<GetPetsUseCase>()));
+
+  getIt.registerFactory<PetDetailsBloc>(() =>
+      PetDetailsBloc(getPetDetailsUseCase: getIt<GetPetDetailsUseCase>()));
 }
