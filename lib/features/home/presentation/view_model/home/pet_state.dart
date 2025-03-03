@@ -6,6 +6,7 @@ class PetState extends Equatable {
   final bool reloadData;
   final List<PetEntity> pets;
   final String? errorMessage;
+  final String? selectedPetId;
 
   const PetState({
     required this.isLoading,
@@ -13,16 +14,17 @@ class PetState extends Equatable {
     required this.reloadData,
     required this.pets,
     this.errorMessage,
+    this.selectedPetId,
   });
 
   factory PetState.initial() {
     return const PetState(
-      isLoading: false,
-      isSuccess: false,
-      reloadData: false,
-      pets: [],
-      errorMessage: null,
-    );
+        isLoading: false,
+        isSuccess: false,
+        reloadData: false,
+        pets: [],
+        errorMessage: null,
+        selectedPetId: null);
   }
 
   PetState copyWith({
@@ -31,6 +33,7 @@ class PetState extends Equatable {
     bool? reloadData,
     List<PetEntity>? pets,
     String? errorMessage,
+    String? selectedPetId,
   }) {
     return PetState(
       isLoading: isLoading ?? this.isLoading,
@@ -38,15 +41,11 @@ class PetState extends Equatable {
       reloadData: reloadData ?? this.reloadData,
       pets: pets ?? this.pets,
       errorMessage: errorMessage ?? this.errorMessage,
+      selectedPetId: selectedPetId ?? this.selectedPetId,
     );
   }
 
   @override
-  List<Object?> get props => [
-        isLoading,
-        isSuccess,
-        reloadData,
-        pets,
-        errorMessage,
-      ];
+  List<Object?> get props =>
+      [isLoading, isSuccess, reloadData, pets, errorMessage, selectedPetId];
 }

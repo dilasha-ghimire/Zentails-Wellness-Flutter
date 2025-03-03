@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/features/home/presentation/view/user_screen/pet_details_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 
 class HomeView extends StatefulWidget {
@@ -153,7 +154,10 @@ class _HomeViewState extends State<HomeView> {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (state.pets.isEmpty) {
+                    final availablePets =
+                        state.pets.where((pet) => pet.availability).toList();
+
+                    if (availablePets.isEmpty) {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(20.0),
@@ -168,7 +172,7 @@ class _HomeViewState extends State<HomeView> {
                     return SizedBox(
                       child: GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: state.pets.length,
+                        itemCount: availablePets.length,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
@@ -179,86 +183,100 @@ class _HomeViewState extends State<HomeView> {
                           childAspectRatio: 0.8,
                         ),
                         itemBuilder: (context, index) {
-                          final pet = state.pets[index];
-                          return LayoutBuilder(
-                            builder: (context, constraints) {
-                              double cardWidth =
-                                  constraints.maxWidth; // Get dynamic width
-                              double imageSize = cardWidth *
-                                  0.8; // Scale image size within the card
-
-                              return Container(
-                                width:
-                                    cardWidth, // Ensures no unnecessary extra space
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF5D4037),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceAround, // Distributes content evenly
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        '${ApiEndpoints.imageUrlForPets}${pet.image}',
-                                        fit: BoxFit
-                                            .contain, // Ensures proper scaling
-                                        height: imageSize,
-                                        width: imageSize,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: cardWidth * 0.03),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            pet.name,
-                                            style: TextStyle(
-                                              color: const Color(0xFFFCF5D7),
-                                              fontSize: cardWidth * 0.08,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign
-                                                .center, // Center text properly
-                                          ),
-                                          SizedBox(height: cardWidth * 0.02),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const Icon(Icons.pets,
-                                                  size: 16,
-                                                  color: Color(0xFFFCF5D7)),
-                                              const SizedBox(width: 5),
-                                              Text(
-                                                pet.breed,
-                                                style: TextStyle(
-                                                  color:
-                                                      const Color(0xFFFCF5D7),
-                                                  fontSize: cardWidth * 0.06,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: cardWidth * 0.02),
-                                          Text(
-                                            "Rs.${pet.chargePerHour}/hr",
-                                            style: TextStyle(
-                                              fontSize: cardWidth * 0.06,
-                                              color: const Color.fromARGB(
-                                                  255, 138, 185, 139),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                          final pet = availablePets[index];
+                          return GestureDetector(
+                            onTap: () {
+                              context
+                                  .read<PetBloc>()
+                                  .add(SelectPet(petId: pet.id));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PetDetailsView()),
                               );
                             },
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                double cardWidth =
+                                    constraints.maxWidth; // Get dynamic width
+                                double imageSize = cardWidth *
+                                    0.8; // Scale image size within the card
+
+                                return Container(
+                                  width:
+                                      cardWidth, // Ensures no unnecessary extra space
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF5D4037),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceAround, // Distributes content evenly
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                          '${ApiEndpoints.imageUrlForPets}${pet.image}',
+                                          fit: BoxFit
+                                              .contain, // Ensures proper scaling
+                                          height: imageSize,
+                                          width: imageSize,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: cardWidth * 0.03),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              pet.name,
+                                              style: TextStyle(
+                                                color: const Color(0xFFFCF5D7),
+                                                fontSize: cardWidth * 0.08,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign
+                                                  .center, // Center text properly
+                                            ),
+                                            SizedBox(height: cardWidth * 0.02),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(Icons.pets,
+                                                    size: 16,
+                                                    color: Color(0xFFFCF5D7)),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  pet.breed,
+                                                  style: TextStyle(
+                                                    color:
+                                                        const Color(0xFFFCF5D7),
+                                                    fontSize: cardWidth * 0.06,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: cardWidth * 0.02),
+                                            Text(
+                                              "Rs.${pet.chargePerHour}/hr",
+                                              style: TextStyle(
+                                                fontSize: cardWidth * 0.06,
+                                                color: const Color.fromARGB(
+                                                    255, 138, 185, 139),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         },
                       ),

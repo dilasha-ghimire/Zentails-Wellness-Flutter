@@ -26,5 +26,9 @@ class PetBloc extends Bloc<PetEvent, PetState> {
         )),
       );
     });
+
+    on<SelectPet>((event, emit) {
+      emit(state.copyWith(selectedPetId: event.petId));
+    });
   }
 }
