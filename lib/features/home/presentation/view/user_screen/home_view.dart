@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/features/home/domain/entity/pet_entity.dart';
 import 'package:zentails_wellness/features/home/presentation/view/user_screen/pet_details_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 
@@ -12,10 +13,30 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  TextEditingController searchController = TextEditingController();
+  List<PetEntity> filteredPets = [];
+  List<PetEntity> allPets = [];
+
   @override
   void initState() {
     super.initState();
     context.read<PetBloc>().add(LoadPets(context: context));
+  }
+
+// 🔍 Search function (updates filteredPets list dynamically)
+  void filterPets(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredPets = allPets; // Reset to full list when empty
+      });
+    } else {
+      setState(() {
+        filteredPets = allPets
+            .where(
+                (pet) => pet.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      });
+    }
   }
 
   @override
@@ -84,6 +105,10 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          filterPets(value); // 🔍 Live filtering
+                        },
                         decoration: InputDecoration(
                           hintText: "Search...",
                           hintStyle: const TextStyle(color: Color(0xFF5D4037)),
@@ -107,19 +132,6 @@ class _HomeViewState extends State<HomeView> {
                                 color: Color(0xFF5D4037), width: 2),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // 🔍 Search Button
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5D4037),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: IconButton(
-                        icon:
-                            const Icon(Icons.search, color: Color(0xFFFCF5D7)),
-                        onPressed: () {},
                       ),
                     ),
                   ],
@@ -153,11 +165,11 @@ class _HomeViewState extends State<HomeView> {
                     if (state.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
-                    final availablePets =
-                        state.pets.where((pet) => pet.availability).toList();
-
-                    if (availablePets.isEmpty) {
+                    if (allPets.isEmpty) {
+                      allPets = state.pets; // Store full job list
+                      filteredPets = allPets; // Initialize filtered list
+                    }
+                    if (filteredPets.isEmpty) {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(20.0),
@@ -172,7 +184,7 @@ class _HomeViewState extends State<HomeView> {
                     return SizedBox(
                       child: GridView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: availablePets.length,
+                        itemCount: filteredPets.length,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
@@ -183,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
                           childAspectRatio: 0.8,
                         ),
                         itemBuilder: (context, index) {
-                          final pet = availablePets[index];
+                          final pet = filteredPets[index];
                           return GestureDetector(
                             onTap: () {
                               context
