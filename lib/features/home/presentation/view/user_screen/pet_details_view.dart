@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/core/common/snackbar/my_snackbar.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/book_appointment/book_appointment_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
@@ -206,19 +207,38 @@ class _PetDetailsViewState extends State<PetDetailsView> {
 
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _showBookingDialog(context, pet.id);
+                      child: BlocListener<BookAppointmentBloc,
+                          BookAppointmentState>(
+                        listener: (context, state) {
+                          if (state.isSuccess) {
+                            showMySnackBar(
+                              context: context,
+                              message: "Appointment booked successfully!",
+                              color: Colors.green,
+                            );
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.of(context).pop(); // Navigate back
+                            });
+                          } else if (!state.isSuccess && !state.isLoading) {
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.of(context).pop(); // Navigate back
+                            });
+                          }
                         },
-                        style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(fontSize: buttonFontSize),
-                          foregroundColor: const Color(0xFFFCF5D7),
-                          backgroundColor: const Color(0xFF5D4037),
-                          shape: const StadiumBorder(),
-                          padding:
-                              EdgeInsets.symmetric(vertical: buttonPadding),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _showBookingDialog(context, pet.id);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            textStyle: TextStyle(fontSize: buttonFontSize),
+                            foregroundColor: const Color(0xFFFCF5D7),
+                            backgroundColor: const Color(0xFF5D4037),
+                            shape: const StadiumBorder(),
+                            padding:
+                                EdgeInsets.symmetric(vertical: buttonPadding),
+                          ),
+                          child: const Text("Book Therapy Session"),
                         ),
-                        child: const Text("Book Therapy Session"),
                       ),
                     ),
                   ],
@@ -242,6 +262,14 @@ class _PetDetailsViewState extends State<PetDetailsView> {
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
         lastDate: DateTime(2101),
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              dialogTheme: DialogThemeData(backgroundColor: Color(0xFFFCF5D7)),
+            ),
+            child: child!,
+          );
+        },
       );
       if (pickedDate != null) {
         dateController.text =
@@ -253,6 +281,14 @@ class _PetDetailsViewState extends State<PetDetailsView> {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              dialogTheme: DialogThemeData(backgroundColor: Color(0xFFFCF5D7)),
+            ),
+            child: child!,
+          );
+        },
       );
       if (pickedTime != null) {
         startTimeController.text = pickedTime.format(context); // Format time
@@ -263,6 +299,14 @@ class _PetDetailsViewState extends State<PetDetailsView> {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              dialogTheme: DialogThemeData(backgroundColor: Color(0xFFFCF5D7)),
+            ),
+            child: child!,
+          );
+        },
       );
       if (pickedTime != null) {
         endTimeController.text = pickedTime.format(context); // Format time
@@ -281,76 +325,145 @@ class _PetDetailsViewState extends State<PetDetailsView> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Book Therapy Session"),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: dateController,
-                  decoration: const InputDecoration(
-                    labelText: "Date",
-                    hintText: "YYYY-MM-DD",
-                  ),
-                  readOnly: true,
-                  onTap: () => selectDate(context), // Open date picker on tap
-                ),
-                TextField(
-                  controller: startTimeController,
-                  decoration: const InputDecoration(
-                    labelText: "Start Time",
-                    hintText: "HH:MM AM/PM",
-                  ),
-                  readOnly: true,
-                  onTap: () =>
-                      selectStartTime(context), // Open time picker on tap
-                ),
-                TextField(
-                  controller: endTimeController,
-                  decoration: const InputDecoration(
-                    labelText: "End Time",
-                    hintText: "HH:MM AM/PM",
-                  ),
-                  readOnly: true,
-                  onTap: () =>
-                      selectEndTime(context), // Open time picker on tap
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                String date = dateController.text; // Date as string
-                int startTime = convertTimeToInt(
-                    startTimeController.text); // Start time as integer
-                int endTime = convertTimeToInt(
-                    endTimeController.text); // End time as integer
+        return LayoutBuilder(builder: (context, constraints) {
+          bool isTablet = constraints.maxWidth >= 600;
+          double dialogWidth = isTablet
+              ? constraints.maxWidth * 0.6
+              : constraints.maxWidth * 0.9;
+          double dialogHeight = isTablet
+              ? constraints.maxHeight * 0.22
+              : constraints.maxHeight * 0.27;
+          double dialogPadding = isTablet ? 30 : 10;
+          double buttonWidth = isTablet ? 200 : 150;
 
-                context.read<BookAppointmentBloc>().add(
-                      BookAppointmentRequested(
-                        context: context,
-                        date: date,
-                        startTime: startTime,
-                        endTime: endTime,
-                        status: "scheduled", // Set the status if needed
-                        petId: petId,
+          return AlertDialog(
+            backgroundColor: const Color(0xFFFCF5D7),
+            title: Center(
+                child: const Text(
+              "Book Therapy Session",
+              style: TextStyle(color: Color(0xFF5D4037)),
+            )),
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: dialogWidth,
+                height: dialogHeight,
+                child: Padding(
+                  padding: EdgeInsets.all(dialogPadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: dateController,
+                        decoration: InputDecoration(
+                          labelText: "Date",
+                          labelStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          hintText: "YYYY-MM-DD",
+                          hintStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                        ),
+                        readOnly: true,
+                        onTap: () => selectDate(context),
                       ),
-                    );
-                Navigator.pop(context);
-                context.read<PetBloc>().add(LoadPets(context: context));
-                Navigator.pop(context);
-              },
-              child: const Text("Book Appointment"),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: startTimeController,
+                        decoration: InputDecoration(
+                          labelText: "Start Time",
+                          labelStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          hintText: "HH:MM AM/PM",
+                          hintStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                        ),
+                        readOnly: true,
+                        onTap: () => selectStartTime(context),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: endTimeController,
+                        decoration: InputDecoration(
+                          labelText: "End Time",
+                          labelStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          hintText: "HH:MM AM/PM",
+                          hintStyle: const TextStyle(color: Color(0xFF5D4037)),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFF5D4037)),
+                          ),
+                        ),
+                        readOnly: true,
+                        onTap: () => selectEndTime(context),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ],
-        );
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    width: buttonWidth,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        String date = dateController.text; // Date as string
+                        int startTime = convertTimeToInt(
+                            startTimeController.text); // Start time as integer
+                        int endTime = convertTimeToInt(
+                            endTimeController.text); // End time as integer
+
+                        context.read<BookAppointmentBloc>().add(
+                              BookAppointmentRequested(
+                                context: context,
+                                date: date,
+                                startTime: startTime,
+                                endTime: endTime,
+                                status: "scheduled", // Set the status if needed
+                                petId: petId,
+                              ),
+                            );
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFCF5D7),
+                        backgroundColor: const Color(0xFF5D4037),
+                      ),
+                      child: const Text("Book Appointment"),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: Color(0xFF5D4037)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
       },
     );
   }

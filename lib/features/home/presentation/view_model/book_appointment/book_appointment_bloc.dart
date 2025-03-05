@@ -28,22 +28,13 @@ class BookAppointmentBloc
       final result = await _bookAppointmentUseCase.call(params);
       result.fold(
         (failure) {
+          emit(state.copyWith(isLoading: false, isSuccess: false));
           showMySnackBar(
             context: event.context,
-            message: failure.message,
-            color: Colors.red,
+            message: "Booking unsuccessful, try again!",
           );
-          emit(state.copyWith(
-              isLoading: false,
-              isSuccess: false,
-              errorMessage: failure.message));
         },
-        (_) {
-          showMySnackBar(
-            context: event.context,
-            message: "Appointment booked successfully!",
-            color: Colors.green,
-          );
+        (result) {
           emit(state.copyWith(
               isLoading: false, isSuccess: true, reloadData: true));
         },
