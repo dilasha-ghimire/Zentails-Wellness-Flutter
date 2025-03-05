@@ -17,11 +17,13 @@ import 'package:zentails_wellness/features/home/data/repository/book_appointment
 import 'package:zentails_wellness/features/home/data/repository/pet_details_remote_repository.dart';
 import 'package:zentails_wellness/features/home/data/repository/pet_remote_repository.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/book_appointment_usecase.dart';
+import 'package:zentails_wellness/features/home/domain/use_case/get_appointment_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_current_user_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_pet_details_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_pets_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/update_user_usecase.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/book_appointment/book_appointment_bloc.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/get_appointment/get_appointment_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
@@ -196,7 +198,13 @@ void _initAppointmentDependencies() {
   getIt.registerLazySingleton<BookAppointmentUseCase>(
       () => BookAppointmentUseCase(getIt<AppointmentRemoteRepository>()));
 
+  getIt.registerLazySingleton<GetAppointmentsUseCase>(
+      () => GetAppointmentsUseCase(getIt<AppointmentRemoteRepository>()));
+
   // Bloc
   getIt.registerFactory<BookAppointmentBloc>(() => BookAppointmentBloc(
       bookAppointmentUseCase: getIt<BookAppointmentUseCase>()));
+
+  getIt.registerFactory<GetAppointmentBloc>(() => GetAppointmentBloc(
+      getAppointmentsUseCase: getIt<GetAppointmentsUseCase>()));
 }
