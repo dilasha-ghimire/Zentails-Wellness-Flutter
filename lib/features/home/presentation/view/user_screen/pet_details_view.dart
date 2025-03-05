@@ -217,10 +217,12 @@ class _PetDetailsViewState extends State<PetDetailsView> {
                               color: Colors.green,
                             );
                             Future.delayed(const Duration(seconds: 2), () {
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pop(); // Navigate back
                             });
                           } else if (!state.isSuccess && !state.isLoading) {
                             Future.delayed(const Duration(seconds: 2), () {
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pop(); // Navigate back
                             });
                           }
@@ -291,6 +293,7 @@ class _PetDetailsViewState extends State<PetDetailsView> {
         },
       );
       if (pickedTime != null) {
+        // ignore: use_build_context_synchronously
         startTimeController.text = pickedTime.format(context); // Format time
       }
     }
@@ -309,6 +312,7 @@ class _PetDetailsViewState extends State<PetDetailsView> {
         },
       );
       if (pickedTime != null) {
+        // ignore: use_build_context_synchronously
         endTimeController.text = pickedTime.format(context); // Format time
       }
     }

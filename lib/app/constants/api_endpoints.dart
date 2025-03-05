@@ -23,4 +23,5 @@ class ApiEndpoints {
 
   // =================== Booking Routes ===========================
   static const String bookAppointment = "therapysessions";
+  static const String getBookingByUserId = "therapysessions/user/";
 }
