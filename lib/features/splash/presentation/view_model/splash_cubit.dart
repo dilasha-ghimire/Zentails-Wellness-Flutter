@@ -1,15 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zentails_wellness/features/auth/data/repository/remote_repository/auth_remote_repository.dart';
 
-class SplashCubit extends Cubit<bool> {
-  final AuthRemoteRepository authRemoteRepository;
+class SplashCubit extends Cubit<void> {
+  SplashCubit() : super(null);
 
-  SplashCubit(this.authRemoteRepository) : super(true);
-
-  Future<void> checkFirstLaunch() async {
+  Future<void> checkNavigation(Function(bool, bool) onNavigate) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-    emit(isFirstLaunch);
+    String? token = prefs.getString('token');
+
+    // Save isFirstLaunch as false after first check
+    if (isFirstLaunch) {
+      await prefs.setBool('isFirstLaunch', false);
+    }
+
+    // Pass both values to determine navigation
+    onNavigate(isFirstLaunch, token != null && token.isNotEmpty);
   }
 }

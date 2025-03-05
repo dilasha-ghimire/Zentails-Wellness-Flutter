@@ -15,12 +15,12 @@ class GetOnboardingData {
       ),
       OnboardingEntity(
         title: "Easy Booking,\nAnytime!",
-        subtitle: "Select your preferred date, time, and\nduration for a seamless therapy\nsession booking experience.",
+        subtitle: "Select your preferred date, time,\nand duration for a seamless therapy\nsession booking experience.",
         imagePath: "assets/images/onboarding_pages/EasyBooking.jpeg",
       ),
       OnboardingEntity(
         title: "Start Your Wellness\nJourney Today",
-        subtitle: "Join us today to experience the\nbenefits of personalized pet therapy.\nPurely pawsitive, always!",
+        subtitle: "Join us today to experience the\nbenefits of personalized pet\ntherapy. Purely pawsitive, always!",
         imagePath: "assets/images/onboarding_pages/TherapySessions.jpeg",
       ),
     ];

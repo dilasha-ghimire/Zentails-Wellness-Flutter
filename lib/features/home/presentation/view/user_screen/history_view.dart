@@ -79,12 +79,24 @@ class _HistoryViewState extends State<HistoryView> {
                         child: Text('No appointments found.'),
                       );
                     } else {
+                      final sortedAppointments = List.from(state.appointments)
+                        ..sort((a, b) {
+                          if (a.status == 'scheduled' &&
+                              b.status != 'scheduled') {
+                            return -1; // 'scheduled' comes first
+                          } else if (a.status != 'scheduled' &&
+                              b.status == 'scheduled') {
+                            return 1; // 'complete' comes after
+                          }
+                          return 0; // Keep order if same status
+                        });
+
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: state.appointments.length,
+                        itemCount: sortedAppointments.length,
                         itemBuilder: (context, index) {
-                          final appointment = state.appointments[index];
+                          final appointment = sortedAppointments[index];
                           return Card(
                             shape: RoundedRectangleBorder(
                               side: BorderSide(

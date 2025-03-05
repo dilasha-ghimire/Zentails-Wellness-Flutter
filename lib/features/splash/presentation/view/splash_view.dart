@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zentails_wellness/app/di/di.dart';
 import 'package:zentails_wellness/features/auth/presentation/view/login_view.dart';
-import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
+import 'package:zentails_wellness/features/home/presentation/view/dashboard_screen/dashboard_view.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view/onboarding_view.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:zentails_wellness/features/splash/presentation/view_model/splash_cubit.dart';
@@ -40,8 +40,32 @@ class _SplashViewState extends State<SplashView>
 
   void _startSplashScreen() async {
     await Future.delayed(const Duration(milliseconds: 4500));
-    // ignore: use_build_context_synchronously
-    context.read<SplashCubit>().checkFirstLaunch();
+
+    if (context.mounted) {
+      context
+          .read<SplashCubit>()
+          .checkNavigation((isFirstLaunch, isAuthenticated) {
+        _navigateToNextScreen(isFirstLaunch, isAuthenticated);
+      });
+    }
+  }
+
+  void _navigateToNextScreen(bool isFirstLaunch, bool isAuthenticated) {
+    Widget nextScreen;
+
+    if (isFirstLaunch) {
+      nextScreen = BlocProvider.value(
+          value: getIt<OnboardingBloc>(), child: const OnboardingView());
+    } else if (isAuthenticated) {
+      nextScreen = DashboardView();
+    } else {
+      nextScreen = LoginView();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => nextScreen),
+    );
   }
 
   @override
@@ -54,46 +78,16 @@ class _SplashViewState extends State<SplashView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFCF5D7),
-      body: BlocListener<SplashCubit, bool>(
-        listener: (context, isFirstLaunch) {
-          if (!isFirstLaunch) {
-            SystemChrome.setPreferredOrientations([
-              DeviceOrientation.portraitUp,
-              DeviceOrientation.landscapeLeft,
-              DeviceOrientation.landscapeRight,
-            ]);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                  value: getIt<LoginBloc>(),
-                  child: LoginView(),
-                ),
-              ),
-            );
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                  value: getIt<OnboardingBloc>(),
-                  child: const OnboardingView(),
-                ),
-              ),
-            );
-          }
-        },
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Align(
-            alignment: Alignment.center,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.70,
-              height: MediaQuery.of(context).size.width * 0.70,
-              child: Lottie.asset(
-                "assets/Lottie/welcome_scene.json",
-                fit: BoxFit.contain,
-              ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.70,
+            height: MediaQuery.of(context).size.width * 0.70,
+            child: Lottie.asset(
+              "assets/Lottie/welcome_scene.json",
+              fit: BoxFit.contain,
             ),
           ),
         ),

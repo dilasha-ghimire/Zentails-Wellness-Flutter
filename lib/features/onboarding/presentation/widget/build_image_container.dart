@@ -56,7 +56,7 @@ Widget buildImageContainer(
               style: const TextStyle(
                 fontFamily: 'GreatVibes Regular',
                 fontWeight: FontWeight.w500,
-                fontSize: 45,
+                fontSize: 43,
                 color: Color(0xFF5D4037),
               ),
             ),
@@ -68,7 +68,7 @@ Widget buildImageContainer(
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: 'SansSerif',
-                  fontSize: 18,
+                  fontSize: 16,
                   color: Color.fromARGB(255, 93, 71, 65),
                   height: 1.5,
                 ),
