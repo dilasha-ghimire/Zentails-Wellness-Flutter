@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/book_appointment/book_appointment_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
 
@@ -206,7 +207,9 @@ class _PetDetailsViewState extends State<PetDetailsView> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _showBookingDialog(context, pet.id);
+                        },
                         style: ElevatedButton.styleFrom(
                           textStyle: TextStyle(fontSize: buttonFontSize),
                           foregroundColor: const Color(0xFFFCF5D7),
@@ -225,6 +228,130 @@ class _PetDetailsViewState extends State<PetDetailsView> {
           );
         },
       ),
+    );
+  }
+
+  void _showBookingDialog(BuildContext context, String petId) {
+    final TextEditingController dateController = TextEditingController();
+    final TextEditingController startTimeController = TextEditingController();
+    final TextEditingController endTimeController = TextEditingController();
+
+    void selectDate(BuildContext context) async {
+      final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2101),
+      );
+      if (pickedDate != null) {
+        dateController.text =
+            "${pickedDate.toLocal()}".split(' ')[0]; // Format as YYYY-MM-DD
+      }
+    }
+
+    void selectStartTime(BuildContext context) async {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+      if (pickedTime != null) {
+        startTimeController.text = pickedTime.format(context); // Format time
+      }
+    }
+
+    void selectEndTime(BuildContext context) async {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+      if (pickedTime != null) {
+        endTimeController.text = pickedTime.format(context); // Format time
+      }
+    }
+
+    int convertTimeToInt(String time) {
+      final TimeOfDay parsedTime = TimeOfDay(
+        hour:
+            int.parse(time.split(':')[0]) % 12 + (time.contains('PM') ? 12 : 0),
+        minute: int.parse(time.split(':')[1].split(' ')[0]),
+      );
+      return parsedTime.hour * 100 + parsedTime.minute;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Book Therapy Session"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: dateController,
+                  decoration: const InputDecoration(
+                    labelText: "Date",
+                    hintText: "YYYY-MM-DD",
+                  ),
+                  readOnly: true,
+                  onTap: () => selectDate(context), // Open date picker on tap
+                ),
+                TextField(
+                  controller: startTimeController,
+                  decoration: const InputDecoration(
+                    labelText: "Start Time",
+                    hintText: "HH:MM AM/PM",
+                  ),
+                  readOnly: true,
+                  onTap: () =>
+                      selectStartTime(context), // Open time picker on tap
+                ),
+                TextField(
+                  controller: endTimeController,
+                  decoration: const InputDecoration(
+                    labelText: "End Time",
+                    hintText: "HH:MM AM/PM",
+                  ),
+                  readOnly: true,
+                  onTap: () =>
+                      selectEndTime(context), // Open time picker on tap
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String date = dateController.text; // Date as string
+                int startTime = convertTimeToInt(
+                    startTimeController.text); // Start time as integer
+                int endTime = convertTimeToInt(
+                    endTimeController.text); // End time as integer
+
+                context.read<BookAppointmentBloc>().add(
+                      BookAppointmentRequested(
+                        context: context,
+                        date: date,
+                        startTime: startTime,
+                        endTime: endTime,
+                        status: "scheduled", // Set the status if needed
+                        petId: petId,
+                      ),
+                    );
+                Navigator.pop(context);
+                context.read<PetBloc>().add(LoadPets(context: context));
+                Navigator.pop(context);
+              },
+              child: const Text("Book Appointment"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

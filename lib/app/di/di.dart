@@ -10,14 +10,18 @@ import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase
 import 'package:zentails_wellness/features/auth/domain/use_case/upload_image_usecase.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
+import 'package:zentails_wellness/features/home/data/data_source/book_appointment_remote_datasource.dart';
 import 'package:zentails_wellness/features/home/data/data_source/pet_details_remote_datasource.dart';
 import 'package:zentails_wellness/features/home/data/data_source/pet_remote_datasource.dart';
+import 'package:zentails_wellness/features/home/data/repository/book_appointment_remote_repository.dart';
 import 'package:zentails_wellness/features/home/data/repository/pet_details_remote_repository.dart';
 import 'package:zentails_wellness/features/home/data/repository/pet_remote_repository.dart';
+import 'package:zentails_wellness/features/home/domain/use_case/book_appointment_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_current_user_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_pet_details_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/get_pets_usecase.dart';
 import 'package:zentails_wellness/features/home/domain/use_case/update_user_usecase.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/book_appointment/book_appointment_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
@@ -45,6 +49,9 @@ Future<void> initDependencies() async {
 
   // Home dependencies
   _initPetDependencies();
+
+  // Appointment dependencies
+  _initAppointmentDependencies();
 }
 
 void _initCoreDependencies() {
@@ -172,4 +179,24 @@ void _initPetDependencies() {
 
   getIt.registerFactory<PetDetailsBloc>(() =>
       PetDetailsBloc(getPetDetailsUseCase: getIt<GetPetDetailsUseCase>()));
+}
+
+void _initAppointmentDependencies() {
+  // Data Source
+  getIt.registerLazySingleton<AppointmentRemoteDataSource>(() =>
+      AppointmentRemoteDataSource(
+          getIt<Dio>(), getIt<SharedPreferencesService>()));
+
+  // Repository
+  getIt.registerLazySingleton<AppointmentRemoteRepository>(() =>
+      AppointmentRemoteRepository(
+          appointmentRemoteDataSource: getIt<AppointmentRemoteDataSource>()));
+
+  // Use case
+  getIt.registerLazySingleton<BookAppointmentUseCase>(
+      () => BookAppointmentUseCase(getIt<AppointmentRemoteRepository>()));
+
+  // Bloc
+  getIt.registerFactory<BookAppointmentBloc>(() => BookAppointmentBloc(
+      bookAppointmentUseCase: getIt<BookAppointmentUseCase>()));
 }
