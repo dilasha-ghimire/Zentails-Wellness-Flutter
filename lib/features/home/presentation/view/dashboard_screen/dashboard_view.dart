@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:zentails_wellness/features/home/presentation/view/user_screen/history_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view/user_screen/home_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view/user_screen/profile_view.dart';
-import 'package:zentails_wellness/features/home/presentation/view/user_screen/review_page.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -18,7 +17,6 @@ class _DashboardViewState extends State<DashboardView> {
   final List<Widget> _screens = [
     const HomeView(),
     const HistoryView(),
-    const ReviewPage(),
     const ProfileView(),
   ];
 
@@ -60,10 +58,6 @@ class _DashboardViewState extends State<DashboardView> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.history),
                   label: "History",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.rate_review),
-                  label: "Reviews",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.person),
