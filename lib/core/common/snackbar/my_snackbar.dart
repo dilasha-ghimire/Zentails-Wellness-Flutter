@@ -19,7 +19,7 @@ showMySnackBar({
         message,
         style: TextStyle(fontSize: fontSize),
       ),
-      backgroundColor: color ?? Colors.green,
+      backgroundColor: color ?? const Color.fromARGB(255, 85, 24, 13),
       duration: const Duration(seconds: 2),
       behavior: SnackBarBehavior.floating,
       margin: EdgeInsets.symmetric(
