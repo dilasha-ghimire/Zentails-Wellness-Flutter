@@ -4,6 +4,7 @@ import 'package:zentails_wellness/app/di/di.dart';
 import 'package:zentails_wellness/core/theme/app_theme.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/login/login_bloc.dart';
 import 'package:zentails_wellness/features/auth/presentation/view_model/register/register_bloc.dart';
+import 'package:zentails_wellness/features/home/presentation/view_model/book_appointment/book_appointment_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/pet_details/pet_details_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
@@ -38,6 +39,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => getIt<PetDetailsBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<BookAppointmentBloc>(),
         ),
       ],
       child: MaterialApp(

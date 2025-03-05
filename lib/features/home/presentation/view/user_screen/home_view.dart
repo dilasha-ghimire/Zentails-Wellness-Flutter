@@ -165,8 +165,12 @@ class _HomeViewState extends State<HomeView> {
                     if (state.isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
+
+                    final availablePets =
+                        state.pets.where((pet) => pet.availability).toList();
+
                     if (allPets.isEmpty) {
-                      allPets = state.pets; // Store full job list
+                      allPets = availablePets; // Store full job list
                       filteredPets = allPets; // Initialize filtered list
                     }
                     if (filteredPets.isEmpty) {
