@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:zentails_wellness/app/constants/api_endpoints.dart';
 import 'package:zentails_wellness/features/home/domain/entity/pet_entity.dart';
 import 'package:zentails_wellness/features/home/presentation/view/user_screen/pet_details_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/home/pet_bloc.dart';
+import 'package:zentails_wellness/features/sensors/presentation/view_model/bloc/sensor_bloc.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -13,6 +15,9 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final ScrollController _scrollController = ScrollController();
+  final double _tiltThreshold = 1.53;
+  bool _sensorScrollEnabled = false;
   TextEditingController searchController = TextEditingController();
   List<PetEntity> filteredPets = [];
   List<PetEntity> allPets = [];
@@ -21,6 +26,8 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     context.read<PetBloc>().add(LoadPets(context: context));
+    context.read<SensorBloc>().add(StartAccelerometerStream());
+    context.read<SensorBloc>().add(SetTiltThreshold(_tiltThreshold));
   }
 
 // 🔍 Search function (updates filteredPets list dynamically)
@@ -40,9 +47,40 @@ class _HomeViewState extends State<HomeView> {
   }
 
   @override
+  void dispose() {
+    context.read<SensorBloc>().add(StopAccelerometerStream()); // Stop sensor
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollWithTilt(AccelerometerEvent event) {
+    double sensitivity = 2.5;
+    double maxSpeed = 30;
+    double delta = 0;
+
+    if (event.y < _tiltThreshold) {
+      delta = (_tiltThreshold - event.y) * sensitivity;
+    }
+
+    if (delta > maxSpeed) delta = maxSpeed;
+
+    if (_scrollController.hasClients && _sensorScrollEnabled) {
+      // Check if sensor scroll is enabled
+      double offset = _scrollController.offset + delta;
+
+      _scrollController.animateTo(
+        offset.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -160,142 +198,160 @@ class _HomeViewState extends State<HomeView> {
                     context.read<PetBloc>().add(LoadPets(context: context));
                   }
                 },
-                child: BlocBuilder<PetBloc, PetState>(
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                child: BlocBuilder<SensorBloc, SensorState>(
+                  builder: (context, sensorState) {
+                    if (sensorState is ScrollPositionUpdated) {
+                      _scrollWithTilt(sensorState.accelerometerEvent);
                     }
-
-                    final availablePets =
-                        state.pets.where((pet) => pet.availability).toList();
-
-                    if (allPets.isEmpty) {
-                      allPets = availablePets; // Store full job list
-                      filteredPets = allPets; // Initialize filtered list
+                    if(sensorState is ProximityStateChanged){
+                      _sensorScrollEnabled = !sensorState.proximityDetected;
                     }
-                    if (filteredPets.isEmpty) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20.0),
-                          child: Text(
-                            "No pets available",
-                            style: TextStyle(
-                                fontSize: 16, color: Color(0xFF5D4037)),
-                          ),
-                        ),
-                      );
-                    }
-                    return SizedBox(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: filteredPets.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemBuilder: (context, index) {
-                          final pet = filteredPets[index];
-                          return GestureDetector(
-                            onTap: () {
-                              context
-                                  .read<PetBloc>()
-                                  .add(SelectPet(petId: pet.id));
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PetDetailsView()),
-                              );
-                            },
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                double cardWidth =
-                                    constraints.maxWidth; // Get dynamic width
-                                double imageSize = cardWidth *
-                                    0.8; // Scale image size within the card
+                    return BlocBuilder<PetBloc, PetState>(
+                      builder: (context, state) {
+                        if (state.isLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                                return Container(
-                                  width:
-                                      cardWidth, // Ensures no unnecessary extra space
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF5D4037),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceAround, // Distributes content evenly
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          '${ApiEndpoints.imageUrlForPets}${pet.image}',
-                                          fit: BoxFit
-                                              .contain, // Ensures proper scaling
-                                          height: imageSize,
-                                          width: imageSize,
-                                        ),
+                        final availablePets = state.pets
+                            .where((pet) => pet.availability)
+                            .toList();
+
+                        if (allPets.isEmpty) {
+                          allPets = availablePets; // Store full job list
+                          filteredPets = allPets; // Initialize filtered list
+                        }
+                        if (filteredPets.isEmpty) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Text(
+                                "No pets available",
+                                style: TextStyle(
+                                    fontSize: 16, color: Color(0xFF5D4037)),
+                              ),
+                            ),
+                          );
+                        }
+                        return SizedBox(
+                          child: GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: filteredPets.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemBuilder: (context, index) {
+                              final pet = filteredPets[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  context
+                                      .read<PetBloc>()
+                                      .add(SelectPet(petId: pet.id));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PetDetailsView()),
+                                  );
+                                },
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    double cardWidth = constraints
+                                        .maxWidth; // Get dynamic width
+                                    double imageSize = cardWidth *
+                                        0.8; // Scale image size within the card
+
+                                    return Container(
+                                      width:
+                                          cardWidth, // Ensures no unnecessary extra space
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF5D4037),
+                                        borderRadius: BorderRadius.circular(16),
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: cardWidth * 0.03),
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              pet.name,
-                                              style: TextStyle(
-                                                color: const Color(0xFFFCF5D7),
-                                                fontSize: cardWidth * 0.08,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign
-                                                  .center, // Center text properly
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .spaceAround, // Distributes content evenly
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Image.network(
+                                              '${ApiEndpoints.imageUrlForPets}${pet.image}',
+                                              fit: BoxFit
+                                                  .contain, // Ensures proper scaling
+                                              height: imageSize,
+                                              width: imageSize,
                                             ),
-                                            SizedBox(height: cardWidth * 0.02),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: cardWidth * 0.03),
+                                            child: Column(
                                               children: [
-                                                const Icon(Icons.pets,
-                                                    size: 16,
-                                                    color: Color(0xFFFCF5D7)),
-                                                const SizedBox(width: 5),
                                                 Text(
-                                                  pet.breed,
+                                                  pet.name,
                                                   style: TextStyle(
                                                     color:
                                                         const Color(0xFFFCF5D7),
+                                                    fontSize: cardWidth * 0.08,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  textAlign: TextAlign
+                                                      .center, // Center text properly
+                                                ),
+                                                SizedBox(
+                                                    height: cardWidth * 0.02),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    const Icon(Icons.pets,
+                                                        size: 16,
+                                                        color:
+                                                            Color(0xFFFCF5D7)),
+                                                    const SizedBox(width: 5),
+                                                    Text(
+                                                      pet.breed,
+                                                      style: TextStyle(
+                                                        color: const Color(
+                                                            0xFFFCF5D7),
+                                                        fontSize:
+                                                            cardWidth * 0.06,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                    height: cardWidth * 0.02),
+                                                Text(
+                                                  "Rs.${pet.chargePerHour}/hr",
+                                                  style: TextStyle(
                                                     fontSize: cardWidth * 0.06,
+                                                    color: const Color.fromARGB(
+                                                        255, 138, 185, 139),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(height: cardWidth * 0.02),
-                                            Text(
-                                              "Rs.${pet.chargePerHour}/hr",
-                                              style: TextStyle(
-                                                fontSize: cardWidth * 0.06,
-                                                color: const Color.fromARGB(
-                                                    255, 138, 185, 139),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
