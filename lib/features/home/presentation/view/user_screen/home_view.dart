@@ -79,134 +79,139 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🏡 Header Section
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Image.asset(
-                          'assets/images/onboarding_pages/Logo.png',
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    ),
-                    const Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome to',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat SemiBold',
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF5D4037),
-                              ),
+      body: BlocListener<SensorBloc, SensorState>(
+        listener: (context, state) {
+          if (state is ScrollPositionUpdated) {
+            if (state.accelerometerEvent.y < _tiltThreshold) {
+              _sensorScrollEnabled = true;
+            } else {
+              _sensorScrollEnabled = false;
+            }
+            _scrollWithTilt(state.accelerometerEvent);
+          }
+        },
+        child: ListView(
+          controller: _scrollController,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 🏡 Header Section
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: Image.asset(
+                              'assets/images/onboarding_pages/Logo.png',
+                              width: 100,
+                              height: 100,
                             ),
-                            Text(
-                              'Zentails Wellness',
-                              style: TextStyle(
-                                fontFamily: 'GreatVibes Regular',
-                                fontSize: 36.0,
-                                color: Color(0xFF5D4037),
-                              ),
+                          ),
+                        ),
+                        const Expanded(
+                          flex: 3,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome to',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat SemiBold',
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF5D4037),
+                                  ),
+                                ),
+                                Text(
+                                  'Zentails Wellness',
+                                  style: TextStyle(
+                                    fontFamily: 'GreatVibes Regular',
+                                    fontSize: 36.0,
+                                    color: Color(0xFF5D4037),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 🔍 Search Button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          filterPets(value); // 🔍 Live filtering
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Search...",
-                          hintStyle: const TextStyle(color: Color(0xFF5D4037)),
-                          filled: true,
-                          fillColor: const Color(0xFFFCF5D7),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 15.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Color(0xFF5D4037)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Color(0xFF5D4037)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: const BorderSide(
-                                color: Color(0xFF5D4037), width: 2),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 🐾 "Our Family" Section
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text(
-                  'Our Family',
-                  style: TextStyle(
-                    fontFamily: 'SansSerif',
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF5D4037),
                   ),
-                ),
-              ),
+                  const SizedBox(height: 20),
 
-              // 🐶 Pet Cards Section
-              BlocListener<PetBloc, PetState>(
-                listener: (context, state) {
-                  if (state.reloadData) {
-                    context.read<PetBloc>().add(LoadPets(context: context));
-                  }
-                },
-                child: BlocBuilder<SensorBloc, SensorState>(
-                  builder: (context, sensorState) {
-                    if (sensorState is ScrollPositionUpdated) {
-                      _scrollWithTilt(sensorState.accelerometerEvent);
-                    }
-                    if(sensorState is ProximityStateChanged){
-                      _sensorScrollEnabled = !sensorState.proximityDetected;
-                    }
-                    return BlocBuilder<PetBloc, PetState>(
+                  // 🔍 Search Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: searchController,
+                            onChanged: (value) {
+                              filterPets(value); // 🔍 Live filtering
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Search...",
+                              hintStyle:
+                                  const TextStyle(color: Color(0xFF5D4037)),
+                              filled: true,
+                              fillColor: const Color(0xFFFCF5D7),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 15.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF5D4037)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF5D4037)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(
+                                    color: Color(0xFF5D4037), width: 2),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // 🐾 "Our Family" Section
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      'Our Family',
+                      style: TextStyle(
+                        fontFamily: 'SansSerif',
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF5D4037),
+                      ),
+                    ),
+                  ),
+
+                  // 🐶 Pet Cards Section
+                  BlocListener<PetBloc, PetState>(
+                    listener: (context, state) {
+                      if (state.reloadData) {
+                        context.read<PetBloc>().add(LoadPets(context: context));
+                      }
+                    },
+                    child: BlocBuilder<PetBloc, PetState>(
                       builder: (context, state) {
                         if (state.isLoading) {
                           return const Center(
@@ -256,8 +261,9 @@ class _HomeViewState extends State<HomeView> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PetDetailsView()),
+                                      builder: (context) =>
+                                          const PetDetailsView(),
+                                    ),
                                   );
                                 },
                                 child: LayoutBuilder(
@@ -352,12 +358,12 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

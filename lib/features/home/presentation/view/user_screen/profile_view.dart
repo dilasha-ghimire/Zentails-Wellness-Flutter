@@ -9,6 +9,7 @@ import 'package:zentails_wellness/app/shared_prefs/shared_preferences_service.da
 import 'package:zentails_wellness/features/auth/presentation/view/login_view.dart';
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/home/presentation/widget/profile/profile_input_field.dart';
+import 'package:zentails_wellness/features/sensors/presentation/view_model/bloc/sensor_bloc.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -29,6 +30,13 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     context.read<ProfileBloc>().add(LoadCurrentUser(context: context));
+    context.read<SensorBloc>().add(StartProximityStream());
+  }
+
+  @override
+  void dispose() {
+    context.read<SensorBloc>().add(StopProximityStream());
+    super.dispose();
   }
 
   Future<void> _checkCameraPermission() async {
@@ -105,147 +113,159 @@ class _ProfileViewState extends State<ProfileView> {
               context.read<ProfileBloc>().add(UpdateUserState());
             }
           },
-          child: BlocBuilder<ProfileBloc, ProfileState>(
-            builder: (context, state) {
-              if (!state.isLoading) {
-                _nameController.text = state.fullName;
-                _emailController.text = state.email;
-                _contactController.text = state.contactNumber;
-                _addressController.text = state.address;
+          child: BlocListener<SensorBloc, SensorState>(
+            listener: (context, state) {
+              if (state is ProximityStateChanged && state.proximityDetected) {
+                context.read<ProfileBloc>().add(Logout());
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginView()),
+                );
               }
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          backgroundColor: const Color(0xFFFCF5D7),
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20),
+            },
+            child: BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (!state.isLoading) {
+                  _nameController.text = state.fullName;
+                  _emailController.text = state.email;
+                  _contactController.text = state.contactNumber;
+                  _addressController.text = state.address;
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            backgroundColor: const Color(0xFFFCF5D7),
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
                             ),
-                          ),
-                          builder: (context) => Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    _checkCameraPermission();
-                                    _browseImage(ImageSource.camera);
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(Icons.camera,
-                                      color: Color(0xFFFCF5D7)),
-                                  label: const Text('Camera',
-                                      style:
-                                          TextStyle(color: Color(0xFFFCF5D7))),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF5D4037),
-                                    minimumSize: const Size(120, 40),
+                            builder: (context) => Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _checkCameraPermission();
+                                      _browseImage(ImageSource.camera);
+                                      Navigator.pop(context);
+                                    },
+                                    icon: const Icon(Icons.camera,
+                                        color: Color(0xFFFCF5D7)),
+                                    label: const Text('Camera',
+                                        style: TextStyle(
+                                            color: Color(0xFFFCF5D7))),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5D4037),
+                                      minimumSize: const Size(120, 40),
+                                    ),
                                   ),
-                                ),
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    _checkCameraPermission();
-                                    _browseImage(ImageSource.gallery);
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(Icons.image,
-                                      color: Color(0xFFFCF5D7)),
-                                  label: const Text('Gallery',
-                                      style:
-                                          TextStyle(color: Color(0xFFFCF5D7))),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF5D4037),
-                                    minimumSize: const Size(120, 40),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _checkCameraPermission();
+                                      _browseImage(ImageSource.gallery);
+                                      Navigator.pop(context);
+                                    },
+                                    icon: const Icon(Icons.image,
+                                        color: Color(0xFFFCF5D7)),
+                                    label: const Text('Gallery',
+                                        style: TextStyle(
+                                            color: Color(0xFFFCF5D7))),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5D4037),
+                                      minimumSize: const Size(120, 40),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: isTablet ? 110 : 70,
-                        backgroundColor: const Color(0xFF5D4037),
-                        backgroundImage: NetworkImage(
-                            '${ApiEndpoints.imageUrlForUser}${state.profilePicture}'),
-                        child: state.profilePicture == null
-                            ? Icon(
-                                Icons.person,
-                                size: isTablet ? 110 : 80,
-                                color: Color(0xFFFCF5D7),
-                              )
-                            : null,
-                      ),
-                    ),
-                    SizedBox(height: isTablet ? 40 : 30),
-                    ProfileInputField(
-                      hintText: "Full Name",
-                      controller: _nameController,
-                    ),
-                    const SizedBox(height: 10),
-                    ProfileInputField(
-                      hintText: "Email",
-                      controller: _emailController,
-                    ),
-                    const SizedBox(height: 10),
-                    ProfileInputField(
-                      hintText: "Contact Number",
-                      controller: _contactController,
-                    ),
-                    const SizedBox(height: 10),
-                    ProfileInputField(
-                      hintText: "Address",
-                      controller: _addressController,
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _updateUser,
-                        style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(fontSize: 25),
-                          foregroundColor: const Color(0xFFFCF5D7),
-                          backgroundColor: const Color(0xFF5D4037),
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text("Update"),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.read<ProfileBloc>().add(Logout());
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginView()),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(fontSize: 25),
-                          foregroundColor: const Color(0xFFFCF5D7),
-                          backgroundColor:
-                              const Color.fromARGB(255, 99, 34, 14),
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: CircleAvatar(
+                          radius: isTablet ? 110 : 70,
+                          backgroundColor: const Color(0xFF5D4037),
+                          backgroundImage: NetworkImage(
+                              '${ApiEndpoints.imageUrlForUser}${state.profilePicture}'),
+                          child: state.profilePicture == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: isTablet ? 110 : 80,
+                                  color: Color(0xFFFCF5D7),
+                                )
+                              : null,
                         ),
-                        child: const Text("Logout"),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      SizedBox(height: isTablet ? 40 : 30),
+                      ProfileInputField(
+                        hintText: "Full Name",
+                        controller: _nameController,
+                      ),
+                      const SizedBox(height: 10),
+                      ProfileInputField(
+                        hintText: "Email",
+                        controller: _emailController,
+                      ),
+                      const SizedBox(height: 10),
+                      ProfileInputField(
+                        hintText: "Contact Number",
+                        controller: _contactController,
+                      ),
+                      const SizedBox(height: 10),
+                      ProfileInputField(
+                        hintText: "Address",
+                        controller: _addressController,
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _updateUser,
+                          style: ElevatedButton.styleFrom(
+                            textStyle: TextStyle(fontSize: 25),
+                            foregroundColor: const Color(0xFFFCF5D7),
+                            backgroundColor: const Color(0xFF5D4037),
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text("Update"),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<ProfileBloc>().add(Logout());
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginView()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            textStyle: TextStyle(fontSize: 25),
+                            foregroundColor: const Color(0xFFFCF5D7),
+                            backgroundColor:
+                                const Color.fromARGB(255, 99, 34, 14),
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text("Logout"),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       );
