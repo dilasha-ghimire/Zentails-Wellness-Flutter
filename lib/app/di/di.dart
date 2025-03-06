@@ -29,6 +29,11 @@ import 'package:zentails_wellness/features/home/presentation/view_model/pet_deta
 import 'package:zentails_wellness/features/home/presentation/view_model/profile/profile_bloc.dart';
 import 'package:zentails_wellness/features/onboarding/domain/use_case/get_onboarding_data.dart';
 import 'package:zentails_wellness/features/onboarding/presentation/view_model/onboarding_bloc.dart';
+import 'package:zentails_wellness/features/sensors/data/repositories/sensor_repository.dart';
+import 'package:zentails_wellness/features/sensors/data/repositories/sensor_repository_impl.dart';
+import 'package:zentails_wellness/features/sensors/domain/usecases/get_accelerometer_data_usecase.dart';
+import 'package:zentails_wellness/features/sensors/domain/usecases/get_proximity_data_usecase.dart';
+import 'package:zentails_wellness/features/sensors/presentation/view_model/bloc/sensor_bloc.dart';
 import 'package:zentails_wellness/features/splash/presentation/view_model/splash_cubit.dart';
 
 final getIt = GetIt.instance;
@@ -54,6 +59,9 @@ Future<void> initDependencies() async {
 
   // Appointment dependencies
   _initAppointmentDependencies();
+
+  // Sensor dependencies
+  _initSensorDependencies();
 }
 
 void _initCoreDependencies() {
@@ -111,9 +119,7 @@ void _initAuthDependencies() {
   );
 
   // SplashCubit
-  getIt.registerFactory<SplashCubit>(
-    () => SplashCubit(getIt<AuthRemoteRepository>()),
-  );
+  getIt.registerFactory<SplashCubit>(() => SplashCubit());
 }
 
 void _initOnboardingDependencies() {
@@ -207,4 +213,30 @@ void _initAppointmentDependencies() {
 
   getIt.registerFactory<GetAppointmentBloc>(() => GetAppointmentBloc(
       getAppointmentsUseCase: getIt<GetAppointmentsUseCase>()));
+}
+
+void _initSensorDependencies() {
+  // Register the concrete implementation of SensorRepository
+  getIt.registerLazySingleton<SensorRepository>(
+    () => SensorRepositoryImpl(), // Concrete class implementation
+  );
+
+  // Register GetAccelerometerDataUseCase
+  getIt.registerLazySingleton<GetAccelerometerDataUseCase>(
+    () => GetAccelerometerDataUseCase(getIt<SensorRepository>()),
+  );
+
+  // Register GetProximityDataUseCase
+  getIt.registerLazySingleton<GetProximityDataUseCase>(
+    () => GetProximityDataUseCase(
+        getIt<SensorRepository>()), // Register Proximity Use Case
+  );
+
+  // Register SensorBloc
+  getIt.registerFactory<SensorBloc>(
+    () => SensorBloc(
+      getIt<GetAccelerometerDataUseCase>(),
+      getIt<GetProximityDataUseCase>(), // Pass the proximity use case
+    ),
+  );
 }

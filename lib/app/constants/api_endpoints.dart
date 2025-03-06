@@ -5,10 +5,16 @@ class ApiEndpoints {
   static const Duration receiveTimeout = Duration(seconds: 1000);
 
   // ====================== Base URL ===========================
-  static const String baseUrl = "http://10.0.2.2:3000/api/";
+  // static const String baseUrl = "http://10.0.2.2:3000/api/";
+  // static const String imageUrlForUser =
+  //     "http://10.0.2.2:3000/uploads/customers/";
+  // static const String imageUrlForPets = "http://10.0.2.2:3000/uploads/pets/";
+
+  static const String baseUrl = "http://192.168.1.65:3000/api/";
   static const String imageUrlForUser =
-      "http://10.0.2.2:3000/uploads/customers/";
-  static const String imageUrlForPets = "http://10.0.2.2:3000/uploads/pets/";
+      "http://192.168.1.65:3000/uploads/customers/";
+  static const String imageUrlForPets =
+      "http://192.168.1.65:3000/uploads/pets/";
 
   // =================== User Routes ===========================
   static const String register = "auth/register";
