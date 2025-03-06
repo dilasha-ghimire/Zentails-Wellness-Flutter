@@ -11,11 +11,19 @@ This is the Flutter/Dart mobile application for the **Zentails Wellness - Purely
 
 ## **🛠 Tech Stack**
 
-* Flutter
-* Dart
+* Flutter (for frontend)
+* Dart (programming language)
+* BLoC (for state management)
+* Clean Architecture (for app structure)
+* Hive (for local storage)
 * Provider (for state management)
 * Dio (for API requests)
 * Shared Preferences (for local storage)
+* Node.js (for backend)
+* MongoDB (for database)
+* GetIt (for dependency injection)
+* Figma (for UI/UX design)
+* Mocktail (for testing)
 
 ## **🔗 Links**
 * [Flutter App Repository](<https://github.com/dilasha-ghimire/Zentails-Wellness-Flutter>)
