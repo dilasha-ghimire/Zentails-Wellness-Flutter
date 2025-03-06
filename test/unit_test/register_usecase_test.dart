@@ -6,15 +6,6 @@ import 'package:zentails_wellness/features/auth/domain/entity/auth_entity.dart';
 import 'package:zentails_wellness/features/auth/domain/repository/auth_repository.dart';
 import 'package:zentails_wellness/features/auth/domain/use_case/register_usecase.dart';
 
-// Data Source Testing ensures that API calls or local database 
-// queries return expected results or handle errors properly.
-
-// Repository Testing verifies that the repository correctly processes 
-// data from the data source and applies domain logic before returning it.
-
-// Use Case Testing ensures that business logic is correctly applied, 
-// orchestrating the repository and handling errors as expected.
-
 // Mock class for the AuthRepository
 class MockAuthRepository extends Mock implements IAuthRepository {}
 
